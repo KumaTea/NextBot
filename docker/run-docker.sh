@@ -3,4 +3,4 @@
 set -ex
 
 cd /home/kuma/bots/rbsk
-/opt/conda/bin/python3 main.py
+/opt/conda/envs/rbsk/bin/python3 main.py

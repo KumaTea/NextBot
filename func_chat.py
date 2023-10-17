@@ -5,7 +5,7 @@ from bot_db import gpt_auth_info
 from session import logger, gpt_auth
 from typing import Union, AsyncGenerator
 from bot_info import gpt_admins, max_chunk
-from gpt_tools import gen_thread, gpt_to_bot
+from gpt_tools import gen_thread, gpt_to_bot, trim_starting_username
 from gpt_core import stream_chat_by_sentences
 from pyrogram.enums.parse_mode import ParseMode
 from pyrogram.types import Message, InlineKeyboardMarkup, InlineKeyboardButton, CallbackQuery
@@ -17,7 +17,7 @@ async def type_in_message(message: Message, generator: AsyncGenerator[str, None]
     parse_mode = None
     chunk_len = 0
     async for chunk in generator:
-        chunk = gpt_to_bot(chunk)
+        chunk = gpt_to_bot(trim_starting_username(chunk))
         text += chunk
         chunk_len += len(chunk)
         if '`' in text:

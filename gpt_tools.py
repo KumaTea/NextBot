@@ -34,6 +34,7 @@ def trim_starting_username(text: str) -> str:
     username_re = re.compile(r'^@[\w_]+:?\s?')
     username = username_re.match(text)
     if username:
+        logger.info(f'[func_chat]\tbefore: {text} after: {text[username.end():]}')
         text = text[username.end():]
     return text
 
@@ -60,10 +61,8 @@ def gpt_to_bot(text: str) -> str:
 
     # nicknames
     for username in nicknames:
-        for nickname in nicknames[username]:
-            if f'@{username}' in text:
-                text = text.replace(f'@{username}', nickname)
-                break
+        if f'@{username}' in text:
+            text = text.replace(f'@{username}', nicknames[username][0])
 
     return text
 
@@ -90,7 +89,7 @@ def gen_thread(dialogue: list[Message]) -> list[dict]:
                 role = 'user'
                 username_string = f'@{message.from_user.username or message.from_user.first_name}: '
             if multiuser:
-                dialog_thread.append({'role': role, 'content': f'{username_string}: {bot_to_gpt(text)}'})
+                dialog_thread.append({'role': role, 'content': username_string + bot_to_gpt(text)})
             else:
                 dialog_thread.append({'role': role, 'content': f'{bot_to_gpt(text)}'})
     for m in dialog_thread:

@@ -9,8 +9,9 @@ words = {
 }
 
 nicknames = {
-    'realKumaTea': ['kuma'],
+    # first order is the one that bot uses
+    'realKumaTea': ['kuma', '蓝毛', '蓝头人'],
     'RimusTG': ['莱姆', '莱德', '晕比'],
-    'atlasnow': ['图图', '图批'],
-    'jiujiucauzyu': ['小黑', '小嗨', '嗨比'],
+    'atlasnow': ['图批', '图图'],
+    'jiujiucauzyu': ['嗨比', '小黑', '小嗨'],
 }
