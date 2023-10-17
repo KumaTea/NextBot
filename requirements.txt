@@ -1,0 +1,6 @@
+openai>=0.27.0
+pyrogram
+uvloop; sys_platform != 'win32'
+
+# conda
+# nomkl
