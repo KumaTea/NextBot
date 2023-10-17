@@ -15,12 +15,13 @@ cmd_re = r'^/\w+(@\w+)?\s'
 
 gpt_inst = ("You are ChatGPT. "
             "You're in a group chat. "
-            "Your reply must be in their language. "
+            "You must reply in their language. "
             "Reply should be short, casual and relaxed. "
             "Be like a friend, not an assistant.")
 
 multiuser_inst = (f'{gpt_inst} '
-                  f'Format: @username: message')
+                  f'Format is "@username: message", '
+                  f'your reply must start with "@ChatGPT: ".')
 
 
 dm_start = (
@@ -44,4 +45,10 @@ group_help = (
     '`/help poll`: show poll help\n'
     '/ping: check for delay\n'
     '/debug: display debug info\n'
+)
+
+gpt_auth_info = (
+    '本 bot 由不愿透露姓名的莱姆老师赞助，'
+    '你目前还不在名单中，'
+    '请等待一位管理员批准申请……'
 )

@@ -3,6 +3,7 @@ from typing import AsyncGenerator
 
 
 periods = [
+    ', ', '，',
     '. ', '。',
     '! ', '！',
     '? ', '？',

@@ -1,6 +1,6 @@
 import os
 
-version = '0.1.0.0'
+version = '1.0.3.20'
 channel = 'local' if os.name == 'nt' else 'cloud'
 username = 'rbskbot'
 
@@ -11,3 +11,6 @@ rimus_id = 1753720065
 
 administrators = [old_kuma_id, kuma_id]
 gpt_admins = administrators + [rimus_id]
+
+max_dialog = 10
+max_chunk = 10

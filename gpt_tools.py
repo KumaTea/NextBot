@@ -1,7 +1,9 @@
 import re
-from bot_info import self_id
-from bot_db import gpt_inst, cmd_re
+from glossary import *
+from session import logger
 from pyrogram.types import Message
+from bot_info import self_id, max_dialog
+from bot_db import gpt_inst, cmd_re, multiuser_inst
 
 
 def trim_command(text: str) -> str:
@@ -13,10 +15,10 @@ def trim_command(text: str) -> str:
     if ' ' in text:
         cmd_pattern = re.compile(cmd_re)
         cmd = cmd_pattern.match(text)
-        if cmd:
-            return text[cmd.end():]
-        else:
-            return text
+        while cmd:
+            text = text[cmd.end():]
+            cmd = cmd_pattern.match(text)
+        return text
     else:
         if text.startswith('/'):
             return ''
@@ -24,25 +26,75 @@ def trim_command(text: str) -> str:
             return text
 
 
+def trim_starting_username(text: str) -> str:
+    """
+    before: @botname text
+    after: text
+    """
+    username_re = re.compile(r'^@[\w_]+:?\s?')
+    username = username_re.match(text)
+    if username:
+        text = text[username.end():]
+    return text
+
+
+def bot_to_gpt(text: str) -> str:
+    # words
+    for slang in words:
+        text = text.replace(slang, words[slang])
+
+    # nicknames
+    for username in nicknames:
+        for nickname in nicknames[username]:
+            if nickname.lower() in text.lower():
+                text = text.replace(nickname, f'@{username}')
+                break
+
+    return text
+
+
+def gpt_to_bot(text: str) -> str:
+    # words
+    for slang in words:
+        text = text.replace(words[slang], slang)
+
+    # nicknames
+    for username in nicknames:
+        for nickname in nicknames[username]:
+            if f'@{username}' in text:
+                text = text.replace(f'@{username}', nickname)
+                break
+
+    return text
+
+
 def gen_thread(dialogue: list[Message]) -> list[dict]:
-    thread = [{'role': 'system', 'content': gpt_inst}]
     multiuser = False
 
-    user_ids = list(set([m.from_user.id for m in dialogue]))
+    user_ids = list(set([m.from_user.id for m in dialogue] + [self_id]))
     if len(user_ids) > 2:
         multiuser = True
+    if multiuser:
+        thread = [{'role': 'system', 'content': multiuser_inst}]
+    else:
+        thread = [{'role': 'system', 'content': gpt_inst}]
+    dialog_thread = []
 
     for message in dialogue:
         if message.text:
             text = trim_command(message.text) or ' '
-            if multiuser:
-                if message.from_user.id == self_id:
-                    thread.append({'role': 'assistant', 'content': '@ChatGPT: ' + text})
-                else:
-                    thread.append({'role': 'user', 'content': f'@{message.from_user.username}: {text}'})
+            if message.from_user.id == self_id:
+                role = 'assistant'
+                username_string = '@ChatGPT: '
             else:
-                if message.from_user.id == self_id:
-                    thread.append({'role': 'assistant', 'content': text})
-                else:
-                    thread.append({'role': 'user', 'content': text})
+                role = 'user'
+                username_string = f'@{message.from_user.username or message.from_user.first_name}: '
+            if multiuser:
+                dialog_thread.append({'role': role, 'content': f'{username_string}: {bot_to_gpt(text)}'})
+            else:
+                dialog_thread.append({'role': role, 'content': f'{bot_to_gpt(text)}'})
+    for m in dialog_thread:
+        logger.info(f'[func_chat]\t' + m['role'] + ': ' + m['content'])
+    dialog_thread = dialog_thread[-max_dialog:]
+    thread.extend(dialog_thread)
     return thread

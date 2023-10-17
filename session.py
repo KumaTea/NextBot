@@ -1,8 +1,9 @@
 import openai
 import logging
 import configparser
-from bot_info import *
 from pyrogram import Client
+from gpt_auth import GPTAuth
+from bot_store import MsgStore
 
 
 logging.basicConfig(
@@ -24,3 +25,6 @@ bot = Client(
 openai.organization = config['openai']['organization']
 openai.api_key = config['openai']['api_key']
 gpt_model = config['openai']['model']
+
+gpt_auth = GPTAuth()
+msg_store = MsgStore()

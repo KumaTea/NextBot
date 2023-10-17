@@ -1,1 +1,1 @@
-from func_chat import chat
+from func_chat import command_chat

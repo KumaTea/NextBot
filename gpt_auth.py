@@ -29,6 +29,3 @@ class GPTAuth:
         if user_id in self.users:
             self.users.remove(user_id)
             self.write_users()
-
-
-gpt_auth = GPTAuth()
