@@ -1,13 +1,13 @@
 import asyncio
 from pyrogram import Client
+from session import gpt_auth
 from tg_tools import get_dialog
-from bot_db import gpt_auth_info
-from session import logger, gpt_auth
 from typing import Union, AsyncGenerator
 from bot_info import gpt_admins, max_chunk
-from gpt_tools import gen_thread, gpt_to_bot, trim_starting_username
+from bot_db import gpt_auth_info, smart_inst
 from gpt_core import stream_chat_by_sentences
 from pyrogram.enums.parse_mode import ParseMode
+from gpt_tools import gen_thread, gpt_to_bot, trim_starting_username
 from pyrogram.types import Message, InlineKeyboardMarkup, InlineKeyboardButton, CallbackQuery
 
 
@@ -100,4 +100,17 @@ async def command_chat(client: Client, message: Message) -> Union[Message, None]
     )
 
     thread = gen_thread(dialog)
+    return await type_in_message(resp_message, stream_chat_by_sentences(thread))
+
+
+@ensure_gpt_auth
+async def command_smart(client: Client, message: Message) -> Union[Message, None]:
+    command = message.text
+    content_index = command.find(' ')
+    if content_index == -1:
+        # no text
+        return await message.reply_text('/smart 不支持无输入调用。')
+
+    resp_message = await message.reply_text('...')
+    thread = gen_thread([message], custom_inst=smart_inst)
     return await type_in_message(resp_message, stream_chat_by_sentences(thread))

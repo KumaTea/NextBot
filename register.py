@@ -9,6 +9,7 @@ from pyrogram.handlers import MessageHandler, CallbackQueryHandler
 def register_handlers():
     # group commands
     bot.add_handler(MessageHandler(command_chat, filters.command(['chat', 'say']) & filters.group))
+    bot.add_handler(MessageHandler(command_smart, filters.command(['smart']) & filters.group))
 
     # group messages
     bot.add_handler(MessageHandler(process_msg, filters.group))

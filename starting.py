@@ -1,5 +1,5 @@
 import os
-from bot_db import pwd, gpt_data_dir
+from bot_db import gpt_data_dir
 from register import register_handlers
 
 

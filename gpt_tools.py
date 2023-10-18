@@ -67,13 +67,15 @@ def gpt_to_bot(text: str) -> str:
     return text
 
 
-def gen_thread(dialogue: list[Message]) -> list[dict]:
+def gen_thread(dialogue: list[Message], custom_inst: str = None) -> list[dict]:
     multiuser = False
 
     user_ids = list(set([m.from_user.id for m in dialogue] + [self_id]))
     if len(user_ids) > 2:
         multiuser = True
-    if multiuser:
+    if custom_inst:
+        thread = [{'role': 'system', 'content': custom_inst}]
+    elif multiuser:
         thread = [{'role': 'system', 'content': multiuser_inst}]
     else:
         thread = [{'role': 'system', 'content': gpt_inst}]
