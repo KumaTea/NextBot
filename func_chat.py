@@ -10,6 +10,7 @@ from pyrogram.enums.parse_mode import ParseMode
 from bot_info import gpt_admins, max_chunk, min_edit_interval
 from gpt_tools import gen_thread, gpt_to_bot, trim_starting_username
 from pyrogram.types import Message, InlineKeyboardMarkup, InlineKeyboardButton, CallbackQuery
+from bot_auth import ensure_not_bl, multi_dec
 
 
 async def type_in_message(message: Message, generator: AsyncGenerator[str, None]) -> Message:
@@ -87,7 +88,7 @@ def ensure_gpt_auth(func):
     return wrapper
 
 
-@ensure_gpt_auth
+@multi_dec([ensure_not_bl, ensure_gpt_auth])
 async def command_chat(client: Client, message: Message) -> Union[Message, None]:
     command = message.text
     content_index = command.find(' ')
@@ -106,7 +107,7 @@ async def command_chat(client: Client, message: Message) -> Union[Message, None]
     return await type_in_message(resp_message, stream_chat_by_sentences(thread))
 
 
-@ensure_gpt_auth
+@multi_dec([ensure_not_bl, ensure_gpt_auth])
 async def command_smart(client: Client, message: Message) -> Union[Message, None]:
     command = message.text
     content_index = command.find(' ')
