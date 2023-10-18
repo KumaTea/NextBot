@@ -4,7 +4,7 @@ FROM kumatea/bot:latest
 
 # Create conda environment
 RUN set -ex && \
-    eval "$(conda shell.bash hook)" && \
+    eval "$(/opt/conda/bin/conda shell.bash hook)" && \
     conda create -n rbsk pyrogram uvloop "openai>=0.27.0" -y && \
     conda clean -afy && \
     conda activate rbsk && \

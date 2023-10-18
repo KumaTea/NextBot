@@ -1,3 +1,4 @@
+from session import logger
 from pyrogram.types import Message
 
 
@@ -6,9 +7,18 @@ class MsgStore:
         self.msgs = {}
 
     def add(self, msg: Message):
-        chat_id = msg.chat.id
-        msg_id = msg.id
+        if len(self.msgs) > 100:
+            logger.warning('[bot_store]\tClearing message store')
+            self.clear()
+        try:
+            chat_id = msg.chat.id
+            msg_id = msg.id
+        except AttributeError:
+            return None
         if chat_id not in self.msgs:
+            self.msgs[chat_id] = {}
+        elif len(self.msgs[chat_id]) > 1000:
+            logger.warning(f'[bot_store]\tClearing message store for chat {chat_id}')
             self.msgs[chat_id] = {}
         self.msgs[chat_id][msg_id] = msg
 
@@ -17,3 +27,6 @@ class MsgStore:
             if msg_id in self.msgs[chat_id]:
                 return self.msgs[chat_id][msg_id]
         return None
+
+    def clear(self):
+        self.msgs = {}
