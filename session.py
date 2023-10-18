@@ -24,7 +24,8 @@ bot = Client(
 
 openai.organization = config['openai']['organization']
 openai.api_key = config['openai']['api_key']
-gpt_model = config['openai']['model']
+openai.log = 'debug'
 
+gpt_model = config['openai']['model']
 gpt_auth = GPTAuth()
 msg_store = MsgStore()

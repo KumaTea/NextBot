@@ -6,11 +6,11 @@ from tg_tools import get_dialog
 from typing import Union, AsyncGenerator
 from bot_db import gpt_auth_info, smart_inst
 from gpt_core import stream_chat_by_sentences
+from bot_auth import ensure_not_bl, multi_dec
 from pyrogram.enums.parse_mode import ParseMode
 from bot_info import gpt_admins, max_chunk, min_edit_interval
 from gpt_tools import gen_thread, gpt_to_bot, trim_starting_username
 from pyrogram.types import Message, InlineKeyboardMarkup, InlineKeyboardButton, CallbackQuery
-from bot_auth import ensure_not_bl, multi_dec
 
 
 async def type_in_message(message: Message, generator: AsyncGenerator[str, None]) -> Message:
@@ -33,6 +33,7 @@ async def type_in_message(message: Message, generator: AsyncGenerator[str, None]
             last_edit = time()
     # last words
     if msg.text.strip().lower()[-max_chunk:] != text.strip().lower()[-max_chunk:]:
+        await asyncio.sleep(max(0, min_edit_interval - (time() - last_edit)))
         msg = await msg.edit_text(text, parse_mode=parse_mode)
     return msg
 
@@ -96,7 +97,7 @@ async def command_chat(client: Client, message: Message) -> Union[Message, None]
     if content_index == -1:
         # no text
         if not reply:
-            return None
+            return await message.reply_text('/chat 不支持无输入调用。')
 
     dialog, resp_message = await asyncio.gather(
         get_dialog(client, message),
