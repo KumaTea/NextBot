@@ -1,8 +1,8 @@
 import asyncio
 from time import time
 from pyrogram import Client
-from session import gpt_auth
 from tg_tools import get_dialog
+from session import gpt_auth, msg_store
 from typing import Union, AsyncGenerator
 from bot_db import gpt_auth_info, smart_inst
 from gpt_core import stream_chat_by_sentences
@@ -35,6 +35,7 @@ async def type_in_message(message: Message, generator: AsyncGenerator[str, None]
     if msg.text.strip().lower()[-max_chunk:] != text.strip().lower()[-max_chunk:]:
         await asyncio.sleep(max(0, min_edit_interval - (time() - last_edit)))
         msg = await msg.edit_text(text, parse_mode=parse_mode)
+    msg_store.add(msg)
     return msg
 
 
