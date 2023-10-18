@@ -1,12 +1,13 @@
 import asyncio
+from time import time
 from pyrogram import Client
 from session import gpt_auth
 from tg_tools import get_dialog
 from typing import Union, AsyncGenerator
-from bot_info import gpt_admins, max_chunk
 from bot_db import gpt_auth_info, smart_inst
 from gpt_core import stream_chat_by_sentences
 from pyrogram.enums.parse_mode import ParseMode
+from bot_info import gpt_admins, max_chunk, min_edit_interval
 from gpt_tools import gen_thread, gpt_to_bot, trim_starting_username
 from pyrogram.types import Message, InlineKeyboardMarkup, InlineKeyboardButton, CallbackQuery
 
@@ -16,6 +17,7 @@ async def type_in_message(message: Message, generator: AsyncGenerator[str, None]
     msg = message
     parse_mode = None
     chunk_len = 0
+    last_edit = time()
     async for chunk in generator:
         chunk = gpt_to_bot(trim_starting_username(chunk))
         text += chunk
@@ -24,9 +26,10 @@ async def type_in_message(message: Message, generator: AsyncGenerator[str, None]
             parse_mode = ParseMode.MARKDOWN
         if text.lower().startswith('@chatgpt: '):
             text = text[len('@chatgpt: '):]
-        if chunk_len > max_chunk:
+        if chunk_len > max_chunk and time() - last_edit > min_edit_interval:
             msg = await msg.edit_text(text, parse_mode=parse_mode)
             chunk_len = 0
+            last_edit = time()
     # last words
     if msg.text.strip().lower()[-max_chunk:] != text.strip().lower()[-max_chunk:]:
         msg = await msg.edit_text(text, parse_mode=parse_mode)
