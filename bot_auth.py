@@ -40,12 +40,3 @@ def ensure_not_bl(func):
         else:
             return await func(client, message)
     return wrapper
-
-
-# https://stackoverflow.com/questions/4122815/
-def multi_dec(decorators: list) -> callable:
-    def decorator(f):
-        for d in decorators:
-            f = d(f)
-        return f
-    return decorator

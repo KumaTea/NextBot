@@ -1,16 +1,17 @@
 import asyncio
 from time import time
 from pyrogram import Client
+from bot_db import smart_inst
 from tg_tools import get_dialog
+from bot_auth import ensure_not_bl
+from gpt_auth import ensure_gpt_auth
 from session import gpt_auth, msg_store
 from typing import Union, AsyncGenerator
-from bot_db import gpt_auth_info, smart_inst
 from gpt_core import stream_chat_by_sentences
-from bot_auth import ensure_not_bl, multi_dec
 from pyrogram.enums.parse_mode import ParseMode
+from pyrogram.types import Message, CallbackQuery
 from bot_info import gpt_admins, max_chunk, min_edit_interval
 from gpt_tools import gen_thread, gpt_to_bot, trim_starting_username
-from pyrogram.types import Message, InlineKeyboardMarkup, InlineKeyboardButton, CallbackQuery
 
 
 async def type_in_message(message: Message, generator: AsyncGenerator[str, None]) -> Message:
@@ -39,23 +40,6 @@ async def type_in_message(message: Message, generator: AsyncGenerator[str, None]
     return msg
 
 
-def has_gpt_auth(client: Client, message: Message) -> bool:
-    if message.from_user:
-        user_id = message.from_user.id
-        if user_id in gpt_auth.users:
-            return True
-    return False
-
-
-async def ask_for_gpt_auth(client: Client, message: Message) -> Union[Message, None]:
-    user_id = message.from_user.id
-    reply_markup = InlineKeyboardMarkup([
-        [InlineKeyboardButton('允许', callback_data=f'gpt_auth_{user_id}_y')],
-        [InlineKeyboardButton('拒绝', callback_data=f'gpt_auth_{user_id}_n')]
-    ])
-    return await message.reply_text(gpt_auth_info, reply_markup=reply_markup)
-
-
 async def callback_gpt_auth(client: Client, callback_query: CallbackQuery) -> tuple:
     task, subtask, user_id, confirm = callback_query.data.split('_')
     user_id = int(user_id)
@@ -81,16 +65,8 @@ async def gpt_callback_handler(client, callback_query):
         return await callback_gpt_auth(client, callback_query)
 
 
-def ensure_gpt_auth(func):
-    async def wrapper(client: Client, message: Message):
-        if has_gpt_auth(client, message):
-            return await func(client, message)
-        else:
-            return await ask_for_gpt_auth(client, message)
-    return wrapper
-
-
-@multi_dec([ensure_not_bl, ensure_gpt_auth])
+@ensure_gpt_auth
+@ensure_not_bl
 async def command_chat(client: Client, message: Message) -> Union[Message, None]:
     command = message.text
     content_index = command.find(' ')
@@ -109,7 +85,8 @@ async def command_chat(client: Client, message: Message) -> Union[Message, None]
     return await type_in_message(resp_message, stream_chat_by_sentences(thread))
 
 
-@multi_dec([ensure_not_bl, ensure_gpt_auth])
+@ensure_gpt_auth
+@ensure_not_bl
 async def command_smart(client: Client, message: Message) -> Union[Message, None]:
     command = message.text
     content_index = command.find(' ')

@@ -2,7 +2,7 @@ import openai
 import logging
 import configparser
 from pyrogram import Client
-from gpt_auth import GPTAuth
+from gpt_auth import gpt_auth
 from bot_store import MsgStore
 
 
@@ -27,5 +27,4 @@ openai.api_key = config['openai']['api_key']
 openai.log = 'warning'
 
 gpt_model = config['openai']['model']
-gpt_auth = GPTAuth()
 msg_store = MsgStore()
