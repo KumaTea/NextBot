@@ -108,6 +108,9 @@ async def command_debate(client: Client, message: Message) -> Union[Message, Non
         # no text
         return await message.reply_text('/debate 不支持无输入调用。')
 
-    resp_message = await message.reply_text('...')
-    thread = gen_thread([message], custom_inst=debate_inst)
+    dialog, resp_message = await asyncio.gather(
+        get_dialog(client, message),
+        message.reply_text('...')
+    )
+    thread = gen_thread(dialog)
     return await type_in_message(resp_message, stream_chat_by_sentences(thread))
