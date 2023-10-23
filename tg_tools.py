@@ -9,9 +9,9 @@ async def get_message(chat_id: int, msg_id: int, client: Client = bot) -> Messag
     if not msg:
         msg = await client.get_messages(chat_id, msg_id)
         msg_store.add(msg)
-        logger.info(f'[tg_tools]\tGet message {msg_id} via API')
+        logger.info(f'[tg_tools]\t\tGet message {msg_id} via API')
     else:
-        logger.info(f'[tg_tools]\tGet message {msg_id} via cache')
+        logger.info(f'[tg_tools]\t\tGet message {msg_id} via cache')
     return msg
 
 

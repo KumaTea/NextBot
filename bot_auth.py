@@ -38,5 +38,8 @@ def ensure_not_bl(func):
             else:
                 return await func(client, message)
         else:
-            return await func(client, message)
+            logging.warning('======= WARNING =======')
+            logging.warning('[bot_auth]\t\tNo from_user in message!')
+            logging.warning(f'{message=}')
+            logging.warning('========  END  ========')
     return wrapper

@@ -1,7 +1,10 @@
 words = {
+    'g/f2d': '官、富二代',
+    'gf2d': '官富二代',
     'f2d': '富二代',
     'g2d': '官二代',
     'fktpr': '疯狂透批人',
+    'fktp': '疯狂透批',
     'tpr': '透批人',
     # 'tp': '透批',  # not to confuse with 'INTP', etc.
     'npy': '男朋友',

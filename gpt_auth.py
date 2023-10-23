@@ -3,7 +3,8 @@ from typing import Union
 from pyrogram import Client
 from bot_info import gpt_admins
 from pyrogram.types import Message
-from bot_db import gpt_users_file, gpt_auth_info
+from pyrogram.enums.parse_mode import ParseMode
+from bot_db import gpt_users_file, gpt_auth_info, bot_debug_info
 from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 
 
@@ -44,12 +45,16 @@ def has_gpt_auth(client: Client, message: Message) -> bool:
 
 
 async def ask_for_gpt_auth(client: Client, message: Message) -> Union[Message, None]:
-    user_id = message.from_user.id
-    reply_markup = InlineKeyboardMarkup([
-        [InlineKeyboardButton('允许', callback_data=f'gpt_auth_{user_id}_y')],
-        [InlineKeyboardButton('拒绝', callback_data=f'gpt_auth_{user_id}_n')]
-    ])
-    return await message.reply_text(gpt_auth_info, reply_markup=reply_markup)
+    if os.name == 'nt':
+        # debugging
+        return await message.reply_text(bot_debug_info, parse_mode=ParseMode.MARKDOWN, disable_web_page_preview=True)
+    else:
+        user_id = message.from_user.id
+        reply_markup = InlineKeyboardMarkup([
+            [InlineKeyboardButton('允许', callback_data=f'gpt_auth_{user_id}_y')],
+            [InlineKeyboardButton('拒绝', callback_data=f'gpt_auth_{user_id}_n')]
+        ])
+        return await message.reply_text(gpt_auth_info, reply_markup=reply_markup)
 
 
 def ensure_gpt_auth(func):

@@ -1,12 +1,12 @@
 import asyncio
 from time import time
 from pyrogram import Client
-from bot_db import smart_inst
 from tg_tools import get_dialog
 from bot_auth import ensure_not_bl
 from gpt_auth import ensure_gpt_auth
 from session import gpt_auth, msg_store
 from typing import Union, AsyncGenerator
+from bot_db import smart_inst, debate_inst
 from gpt_core import stream_chat_by_sentences
 from pyrogram.enums.parse_mode import ParseMode
 from pyrogram.types import Message, CallbackQuery
@@ -29,13 +29,13 @@ async def type_in_message(message: Message, generator: AsyncGenerator[str, None]
         if text.lower().startswith('@chatgpt: '):
             text = text[len('@chatgpt: '):]
         if chunk_len > max_chunk and time() - last_edit > min_edit_interval:
-            msg = await msg.edit_text(text, parse_mode=parse_mode)
+            msg = await msg.edit_text(text, parse_mode=parse_mode, disable_web_page_preview=True)
             chunk_len = 0
             last_edit = time()
     # last words
     if msg.text.strip().lower()[-max_chunk:] != text.strip().lower()[-max_chunk:]:
         await asyncio.sleep(max(0, min_edit_interval - (time() - last_edit)))
-        msg = await msg.edit_text(text, parse_mode=parse_mode)
+        msg = await msg.edit_text(text, parse_mode=parse_mode, disable_web_page_preview=True)
     msg_store.add(msg)
     return msg
 
@@ -96,4 +96,18 @@ async def command_smart(client: Client, message: Message) -> Union[Message, None
 
     resp_message = await message.reply_text('...')
     thread = gen_thread([message], custom_inst=smart_inst)
+    return await type_in_message(resp_message, stream_chat_by_sentences(thread))
+
+
+@ensure_gpt_auth
+@ensure_not_bl
+async def command_debate(client: Client, message: Message) -> Union[Message, None]:
+    command = message.text
+    content_index = command.find(' ')
+    if content_index == -1:
+        # no text
+        return await message.reply_text('/debate 不支持无输入调用。')
+
+    resp_message = await message.reply_text('...')
+    thread = gen_thread([message], custom_inst=debate_inst)
     return await type_in_message(resp_message, stream_chat_by_sentences(thread))

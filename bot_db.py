@@ -19,9 +19,8 @@ gpt_inst = ("You are ChatGPT. "
             "Reply should be short, casual and relaxed. "
             "Be like a friend, not an assistant.")
 
-multiuser_inst = (f'{gpt_inst} '
-                  f'Format is "@username: message", '
-                  f'your reply must start with "@ChatGPT: ".')
+multiuser_inst = (f'Format is "@username: message", '
+                  f'your reply must start with "@ChatGPT: "')
 
 # credit: https://arxiv.org/abs/2309.03409
 magic_prompt = 'Take a deep breath and work on this problem step-by-step. '
@@ -39,6 +38,21 @@ smart_inst = (
     '\n'
     'You must reply in the language of the question asked. '
     f'You should {less_magic_prompt}, and start your answer with "{magic_prompt}" in that language.'
+)
+
+debate_inst = (
+    'You are ChatGPT, '
+    'a debater with sharp thinking and fluent eloquence. '
+    'You have extensive experience finding flaws and refuting them. '
+    'You are polite but confrontational, '
+    'eager to refute arguments to the best of your ability. '
+    'You are open-minded, never give up on challenging others\' views.'
+    '\n'
+    'Here is your opponent\'s opinion. '
+    'You must debate in their language. '
+    'Never agree with them, '
+    'find the flaws, provide detailed and powerful evidences, '
+    'and refute concisely without mercy!'
 )
 
 
@@ -70,3 +84,14 @@ gpt_auth_info = (
     '你目前还不在名单中，'
     '请等待一位管理员批准申请……'
 )
+
+bot_debug_info = (
+    '本 bot 现正升级调试中，请稍后再调用。'
+    '升级内容详见 [GitHub](https://github.com/KumaTea/NextBot)'
+)
+
+bot_commands = {
+    'chat': ['chat', 'say', 'c'],
+    'smart': ['smart', 's'],
+    'debate': ['debate', 'd', 'g'],
+}

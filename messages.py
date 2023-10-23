@@ -1,9 +1,9 @@
 from typing import Union
 from session import logger
 from pyrogram import Client
-from bot_info import self_id
 from bot_auth import ensure_not_bl
 from pyrogram.types import Message
+from bot_info import self_id, username
 from func_chat import command_chat, ensure_gpt_auth
 
 
@@ -23,6 +23,10 @@ async def process_msg(client: Client, message: Message) -> Union[Message, None]:
     if text and reply:
         try:
             if reply.from_user.id == self_id:
+                return await replied_chat(client, message)
+            elif text.startswith(f'@{username}') or text.endswith(f'@{username}'):
+                # mentioning me
+                message.text = text.replace(f'@{username}', '').strip()
                 return await replied_chat(client, message)
         except AttributeError:
             logger.warning('======== ERROR ========')

@@ -3,7 +3,7 @@ from glossary import *
 from session import logger
 from pyrogram.types import Message
 from bot_info import self_id, max_dialog
-from bot_db import gpt_inst, cmd_re, multiuser_inst
+from bot_db import *
 
 
 def trim_command(text: str) -> str:
@@ -73,12 +73,29 @@ def gen_thread(dialogue: list[Message], custom_inst: str = None) -> list[dict]:
     user_ids = list(set([m.from_user.id for m in dialogue] + [self_id]))
     if len(user_ids) > 2:
         multiuser = True
+
+    inst = {}
     if custom_inst:
-        thread = [{'role': 'system', 'content': custom_inst}]
-    elif multiuser:
-        thread = [{'role': 'system', 'content': multiuser_inst}]
+        inst = {'role': 'system', 'content': custom_inst}
     else:
-        thread = [{'role': 'system', 'content': gpt_inst}]
+        first_msg_text = dialogue[0].text
+        if first_msg_text:
+            command = ''
+            for cmd_type in bot_commands:  # 'chat', 'smart', 'debate'
+                for cmd in bot_commands[cmd_type]:  # 'chat', 'c', etc.
+                    if first_msg_text.startswith(f'/{cmd}'):
+                        command = cmd_type
+                        break
+            if command == 'smart':
+                inst = {'role': 'system', 'content': smart_inst}
+            elif command == 'debate':
+                inst = {'role': 'system', 'content': debate_inst}
+    if not inst:
+        inst = {'role': 'system', 'content': gpt_inst}
+    if multiuser:
+        inst['content'] += ' ' + multiuser_inst
+
+    thread = [inst]
     dialog_thread = []
 
     for message in dialogue:
