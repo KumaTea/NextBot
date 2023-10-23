@@ -1,9 +1,10 @@
 import re
+from bot_db import *
 from glossary import *
 from session import logger
+from pprint import PrettyPrinter
 from pyrogram.types import Message
 from bot_info import self_id, max_dialog
-from bot_db import *
 
 
 def trim_command(text: str) -> str:
@@ -115,4 +116,5 @@ def gen_thread(dialogue: list[Message], custom_inst: str = None) -> list[dict]:
         logger.info(f'[func_chat]\t' + m['role'] + ': ' + m['content'])
     dialog_thread = dialog_thread[-max_dialog:]
     thread.extend(dialog_thread)
+    PrettyPrinter().pprint(thread)
     return thread
