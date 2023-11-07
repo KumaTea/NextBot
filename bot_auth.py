@@ -6,6 +6,9 @@ from pyrogram.raw.functions.contacts.get_blocked import GetBlocked
 try:
     from local_db import trusted_group, bl_users
 except ImportError:
+    logging.warning('======== WARNING ========')
+    logging.warning('[bot_auth]\t\tImportError')
+    logging.warning('========  END  ========')
     trusted_group = []
     bl_users = []
 
@@ -38,8 +41,9 @@ def ensure_not_bl(func):
             else:
                 return await func(client, message)
         else:
-            logging.warning('======= WARNING =======')
-            logging.warning('[bot_auth]\t\tNo from_user in message!')
-            logging.warning(f'{message=}')
-            logging.warning('========  END  ========')
+            # logging.warning('======= WARNING =======')
+            # logging.warning('[bot_auth]\t\tNo from_user in message!')
+            # logging.warning(f'{message=}')
+            # logging.warning('========  END  ========')
+            return None
     return wrapper

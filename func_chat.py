@@ -65,8 +65,8 @@ async def gpt_callback_handler(client, callback_query):
         return await callback_gpt_auth(client, callback_query)
 
 
-@ensure_gpt_auth
 @ensure_not_bl
+@ensure_gpt_auth
 async def command_chat(client: Client, message: Message) -> Union[Message, None]:
     command = message.text
     content_index = command.find(' ')
@@ -85,8 +85,8 @@ async def command_chat(client: Client, message: Message) -> Union[Message, None]
     return await type_in_message(resp_message, stream_chat_by_sentences(thread))
 
 
-@ensure_gpt_auth
 @ensure_not_bl
+@ensure_gpt_auth
 async def command_smart(client: Client, message: Message) -> Union[Message, None]:
     command = message.text
     content_index = command.find(' ')
@@ -99,8 +99,8 @@ async def command_smart(client: Client, message: Message) -> Union[Message, None
     return await type_in_message(resp_message, stream_chat_by_sentences(thread))
 
 
-@ensure_gpt_auth
 @ensure_not_bl
+@ensure_gpt_auth
 async def command_debate(client: Client, message: Message) -> Union[Message, None]:
     command = message.text
     content_index = command.find(' ')

@@ -29,9 +29,9 @@ async def process_msg(client: Client, message: Message) -> Union[Message, None]:
                 message.text = text.replace(f'@{username}', '').strip()
                 return await replied_chat(client, message)
         except AttributeError:
-            logger.warning('======== ERROR ========')
-            logger.warning('[messages]\tAttributeError')
-            logger.warning(f'{message=}')
-            logger.warning('========  END  ========')
+            # logger.warning('======== ERROR ========')
+            # logger.warning('[messages]\tAttributeError')
+            # logger.warning(f'{message=}')
+            # logger.warning('========  END  ========')
             return None
     return None
