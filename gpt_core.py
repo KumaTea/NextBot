@@ -14,13 +14,13 @@ async def stream_chat(messages: list, model: str = gpt_model) -> AsyncGenerator[
     """
     This function yield chunks, not full message!
     """
-    async for chunk in await openai.ChatCompletion.acreate(
+    async for chunk in await gpt.chat.completions.create(
         model=model,
         messages=messages,
         stream=True
     ):
         # ref: https://til.simonwillison.net/gpt3/python-chatgpt-streaming-api
-        content = chunk["choices"][0].get("delta", {}).get("content")
+        content = chunk.choices[0].delta.content
         if content:
             yield content
 

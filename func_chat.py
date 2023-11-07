@@ -1,12 +1,12 @@
 import asyncio
 from time import time
 from pyrogram import Client
+from bot_db import smart_inst
 from tg_tools import get_dialog
 from bot_auth import ensure_not_bl
 from gpt_auth import ensure_gpt_auth
 from session import gpt_auth, msg_store
 from typing import Union, AsyncGenerator
-from bot_db import smart_inst, debate_inst
 from gpt_core import stream_chat_by_sentences
 from pyrogram.enums.parse_mode import ParseMode
 from pyrogram.types import Message, CallbackQuery
