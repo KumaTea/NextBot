@@ -5,6 +5,7 @@ from session import logger
 from pprint import PrettyPrinter
 from pyrogram.types import Message
 from bot_info import self_id, max_dialog
+from pyrogram.parser.parser import Parser
 
 
 def trim_command(text: str) -> str:
@@ -37,6 +38,26 @@ def trim_starting_username(text: str) -> str:
     if username:
         logger.info(f'[func_chat]\tbefore: {text} after: {text[username.end():]}')
         text = text[username.end():]
+    return text
+
+
+def unparse_markdown(message: Message) -> str:
+    p = Parser(client=None)
+    result = p.unparse(
+        text=message.text,
+        entities=message.entities,
+        is_html=False
+    )
+    return result
+
+
+def process_message(message: Message) -> str:
+    if message.entities:
+        text = unparse_markdown(message)
+    else:
+        text = message.text
+    text = trim_command(text)
+    # text = trim_starting_username(text)
     return text
 
 
@@ -101,7 +122,7 @@ def gen_thread(dialogue: list[Message], custom_inst: str = None) -> list[dict]:
 
     for message in dialogue:
         if message.text:
-            text = trim_command(message.text) or ' '
+            text = process_message(message) or ' '
             if message.from_user.id == self_id:
                 role = 'assistant'
                 username_string = '@ChatGPT: '

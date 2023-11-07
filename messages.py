@@ -10,6 +10,11 @@ from func_chat import command_chat, ensure_gpt_auth
 @ensure_gpt_auth
 async def replied_chat(client: Client, message: Message) -> Union[Message, None]:
     message.text = f'/chat {message.text}'
+
+    if message.entities:
+        for entity in message.entities:
+            entity.offset += 6
+
     return await command_chat(client, message)
 
 
