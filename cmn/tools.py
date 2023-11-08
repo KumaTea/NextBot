@@ -1,10 +1,13 @@
 import os
+from bot.bot_db import pwd
 
 
 def sort_imports():
-    python_files = [i for i in os.listdir() if i.endswith('.py')]
-    for file in python_files:
-        sort_import(file)
+    # python_files = [i for i in os.listdir() if i.endswith('.py')]
+    for root, dirs, files in os.walk(pwd):
+        for file in files:
+            if file.endswith('.py'):
+                sort_import(os.path.join(root, file))
 
 
 def sort_import(file):

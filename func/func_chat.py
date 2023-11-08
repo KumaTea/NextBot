@@ -1,17 +1,17 @@
 import asyncio
 from time import time
 from pyrogram import Client
-from bot_db import smart_inst
-from tg_tools import get_dialog
-from bot_auth import ensure_not_bl
-from gpt_auth import ensure_gpt_auth
-from session import gpt_auth, msg_store
+from bot.bot_db import smart_inst
+from bot.tg_tools import get_dialog
+from bot.bot_auth import ensure_not_bl
+from gpt.gpt_auth import ensure_gpt_auth
 from typing import Union, AsyncGenerator
-from gpt_core import stream_chat_by_sentences
+from cmn.session import gpt_auth, msg_store
 from pyrogram.enums.parse_mode import ParseMode
+from gpt.gpt_core import stream_chat_by_sentences
 from pyrogram.types import Message, CallbackQuery
-from bot_info import gpt_admins, max_chunk, min_edit_interval
-from gpt_tools import gen_thread, gpt_to_bot, trim_starting_username
+from bot.bot_info import gpt_admins, max_chunk, min_edit_interval
+from gpt.gpt_tools import gen_thread, gpt_to_bot, trim_starting_username
 
 
 async def type_in_message(message: Message, generator: AsyncGenerator[str, None]) -> Message:

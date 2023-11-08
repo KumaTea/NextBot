@@ -1,9 +1,9 @@
-from bot_db import *
-from functions import *
-from session import bot
+from bot.bot_db import *
+from cmn.session import bot
+from func.functions import *
 from pyrogram import filters
-from messages import process_msg
-from callbacks import process_callback
+from bot.messages import process_msg
+from bot.callbacks import process_callback
 from pyrogram.handlers import MessageHandler, CallbackQueryHandler
 
 

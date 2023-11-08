@@ -1,6 +1,6 @@
 from pyrogram import Client
 from pyrogram.types import CallbackQuery
-from func_chat import gpt_callback_handler
+from func.func_chat import gpt_callback_handler
 
 
 async def process_callback(client: Client, callback_query: CallbackQuery):

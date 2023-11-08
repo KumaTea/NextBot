@@ -1,10 +1,10 @@
 from typing import Union
-from session import logger
 from pyrogram import Client
-from bot_auth import ensure_not_bl
+from cmn.session import logger
 from pyrogram.types import Message
-from bot_info import self_id, username
-from func_chat import command_chat, ensure_gpt_auth
+from bot.bot_auth import ensure_not_bl
+from bot.bot_info import self_id, username
+from func.func_chat import command_chat, ensure_gpt_auth
 
 
 @ensure_gpt_auth

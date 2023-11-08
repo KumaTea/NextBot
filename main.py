@@ -4,13 +4,19 @@ if os.name == 'posix':
     import uvloop
     uvloop.install()
 
-
-from session import bot
-from starting import starting
+from bot.starting import starting
+from bot.stopping import stopping
+from cmn.session import bot, logger
 
 
 starting()
 
 
 if __name__ == '__main__':
-    bot.run()
+    try:
+        bot.run()
+    except Exception as e:
+        logger.warning('[main]\tException')
+        logger.warning(f'{e=}')
+    finally:
+        stopping()

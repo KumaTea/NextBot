@@ -1,7 +1,7 @@
 from pyrogram import Client
-from bot_info import max_dialog
 from pyrogram.types import Message
-from session import bot, msg_store, logger
+from bot.bot_info import max_dialog
+from cmn.session import bot, msg_store, logger
 
 
 async def get_message(chat_id: int, msg_id: int, client: Client = bot) -> Message:

@@ -69,6 +69,7 @@ unknown_message = "I can't understand your message or command. You may try /help
 
 gpt_data_dir = os.path.join(pwd, 'data/gpt')
 gpt_users_file = os.path.join(gpt_data_dir, 'users.txt')
+msg_data_dir = os.path.join(pwd, 'data/msg')
 
 group_help = (
     '/rp: repeat\n'
