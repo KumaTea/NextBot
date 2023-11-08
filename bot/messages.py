@@ -3,6 +3,7 @@ from pyrogram import Client
 from cmn.session import logger
 from pyrogram.types import Message
 from bot.bot_auth import ensure_not_bl
+from func.func_voice import process_voice
 from bot.bot_info import self_id, username
 from func.func_chat import command_chat, ensure_gpt_auth
 
@@ -23,6 +24,7 @@ async def process_msg(client: Client, message: Message) -> Union[Message, None]:
     user_id = message.from_user.id
     if user_id == self_id:
         return None
+
     text = message.text
     reply = message.reply_to_message
     if text and reply:
@@ -39,4 +41,7 @@ async def process_msg(client: Client, message: Message) -> Union[Message, None]:
             # logger.warning(f'{message=}')
             # logger.warning('========  END  ========')
             return None
+
+    if message.voice:
+        return await process_voice(message)
     return None

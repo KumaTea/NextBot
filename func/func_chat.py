@@ -1,7 +1,7 @@
+import random
 import asyncio
 from time import time
 from pyrogram import Client
-from bot.bot_db import smart_inst
 from bot.tg_tools import get_dialog
 from bot.bot_auth import ensure_not_bl
 from gpt.gpt_auth import ensure_gpt_auth
@@ -10,6 +10,7 @@ from cmn.session import gpt_auth, msg_store
 from pyrogram.enums.parse_mode import ParseMode
 from gpt.gpt_core import stream_chat_by_sentences
 from pyrogram.types import Message, CallbackQuery
+from bot.bot_db import smart_inst, thinking_emojis
 from bot.bot_info import gpt_admins, max_chunk, min_edit_interval
 from gpt.gpt_tools import gen_thread, gpt_to_bot, trim_starting_username
 
@@ -78,7 +79,7 @@ async def command_chat(client: Client, message: Message) -> Union[Message, None]
 
     dialog, resp_message = await asyncio.gather(
         get_dialog(client, message),
-        message.reply_text('...')
+        message.reply_text(random.choice(thinking_emojis) + '❓')
     )
 
     thread = gen_thread(dialog)
@@ -94,7 +95,7 @@ async def command_smart(client: Client, message: Message) -> Union[Message, None
         # no text
         return await message.reply_text('/smart 不支持无输入调用。')
 
-    resp_message = await message.reply_text('...')
+    resp_message = await message.reply_text(random.choice(thinking_emojis) + '❓')
     thread = gen_thread([message], custom_inst=smart_inst)
     return await type_in_message(resp_message, stream_chat_by_sentences(thread))
 
@@ -110,7 +111,7 @@ async def command_debate(client: Client, message: Message) -> Union[Message, Non
 
     dialog, resp_message = await asyncio.gather(
         get_dialog(client, message),
-        message.reply_text('...')
+        message.reply_text(random.choice(thinking_emojis) + '❓')
     )
     thread = gen_thread(dialog)
     return await type_in_message(resp_message, stream_chat_by_sentences(thread))
