@@ -3,8 +3,10 @@ import uuid
 import random
 import asyncio
 import logging
+from typing import Optional
 from cmn.session import gpt
 from pyrogram.types import Message
+from bot.bot_info import max_voice
 from bot.bot_db import thinking_emojis
 
 
@@ -39,16 +41,21 @@ async def transcribe_voice(voice_path: str) -> str:
             language='zh'
         )
     text = transcript.text
+    if not text.strip():
+        text = '啥也没说'
     logging.info(f'[func_voice]\t{text}')
     return text
 
 
-async def process_voice(message: Message) -> Message:
+async def process_voice(message: Message) -> Optional[Message]:
     """
     Transcribe the voice message.
     :param message: The message object.
     :return: The message object.
     """
+    voice = message.voice
+    if voice.duration > max_voice:
+        return None
     inform = None
     voice_path = None
     try:
@@ -57,6 +64,8 @@ async def process_voice(message: Message) -> Message:
             save_voice(message)
         )
         user_mention = message.from_user.mention(style="md")
+        if message.forward_from:
+            user_mention += ' 🔊 ' + message.forward_from.mention(style="md")
         transcription = await transcribe_voice(voice_path)
         text = user_mention + ':\n' + transcription
         return await inform.edit_text(text)
@@ -64,7 +73,7 @@ async def process_voice(message: Message) -> Message:
         logging.warning(f'[func_voice]\tERROR!!!')
         logging.warning(f'[func_voice]\t{e}')
         if isinstance(inform, Message):
-            await inform.edit_text('听不懂捏')
+            return await inform.edit_text('听不懂捏')
     finally:
         if voice_path and os.path.isfile(voice_path):
             os.remove(voice_path)
