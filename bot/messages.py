@@ -21,9 +21,10 @@ async def replied_chat(client: Client, message: Message) -> Union[Message, None]
 
 @ensure_not_bl
 async def process_msg(client: Client, message: Message) -> Union[Message, None]:
-    user_id = message.from_user.id
-    if user_id == self_id:
-        return None
+    if message.from_user:
+        user_id = message.from_user.id
+        if user_id == self_id:
+            return None
 
     text = message.text
     reply = message.reply_to_message

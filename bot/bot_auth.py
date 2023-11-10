@@ -12,10 +12,12 @@ except ImportError:
     trusted_group = []
     bl_users = []
 
+# from cmn.session import config
+#
 # me = Client(
 #     'me',
-#     api_id=config['kuma']['api_id'],
-#     api_hash=config['kuma']['api_hash']
+#     api_id=config['tg']['api_id'],
+#     api_hash=config['tg']['api_hash']
 # )
 
 
@@ -39,6 +41,9 @@ def ensure_not_bl(func):
                 logging.warning(f'User {user_id} is in blacklist! Ignoring message.')
                 return None
             else:
+                return await func(client, message)
+        elif message.sender_chat:
+            if not message.forward_from_chat:
                 return await func(client, message)
         else:
             # logging.warning('======= WARNING =======')

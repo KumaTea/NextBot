@@ -4,10 +4,11 @@ import random
 import asyncio
 import logging
 from typing import Optional
-from cmn.session import gpt
 from pyrogram.types import Message
 from bot.bot_info import max_voice
+from cmn.session import gpt, msg_store
 from bot.bot_db import thinking_emojis
+from pyrogram.enums.parse_mode import ParseMode
 
 
 def gen_uuid(length: int = 4) -> str:
@@ -41,9 +42,11 @@ async def transcribe_voice(voice_path: str) -> str:
             language='zh'
         )
     text = transcript.text
+    logging.info(f'[func_voice]\t{text}')
     if not text.strip():
         text = '啥也没说'
-    logging.info(f'[func_voice]\t{text}')
+    elif '字幕by索兰娅' in text:
+        text = '啥也没说'
     return text
 
 
@@ -63,12 +66,22 @@ async def process_voice(message: Message) -> Optional[Message]:
             message.reply_text(random.choice(thinking_emojis) + '👂', quote=False),
             save_voice(message)
         )
-        user_mention = message.from_user.mention(style="md")
-        if message.forward_from:
-            user_mention += ' 🔊 ' + message.forward_from.mention(style="md")
+        if message.from_user:
+            user_mention = message.from_user.mention(style="md")
+            if message.forward_from:
+                user_mention += ' 🔊 ' + message.forward_from.mention(style="md")
+        elif message.sender_chat:
+            if message.sender_chat.username:
+                user_mention = f'[{message.sender_chat.title}](tg://resolve?domain={message.sender_chat.username})'
+            else:
+                user_mention = message.sender_chat.title
+        else:
+            user_mention = '😎'
         transcription = await transcribe_voice(voice_path)
         text = user_mention + ':\n' + transcription
-        return await inform.edit_text(text)
+        setattr(message, 'transcription', transcription)
+        msg_store.add(message)
+        return await inform.edit_text(text, parse_mode=ParseMode.MARKDOWN)
     except Exception as e:
         logging.warning(f'[func_voice]\tERROR!!!')
         logging.warning(f'[func_voice]\t{e}')
