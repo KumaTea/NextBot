@@ -7,7 +7,7 @@ from typing import Optional
 from pyrogram.types import Message
 from bot.bot_info import max_voice
 from cmn.session import gpt, msg_store
-from bot.bot_db import thinking_emojis
+from bot.bot_db import thinking_emojis, whisper_blacklist
 from pyrogram.enums.parse_mode import ParseMode
 
 
@@ -27,7 +27,6 @@ async def save_voice(message: Message) -> str:
     :return: The path of the saved file.
     """
     voice = message.voice
-    file_id = voice.file_id
     file_name = gen_uuid()
     file_path = f'/dev/shm/{file_name}.ogg'
     await message.download(file_path)
@@ -43,10 +42,13 @@ async def transcribe_voice(voice_path: str) -> str:
         )
     text = transcript.text
     logging.info(f'[func_voice]\t{text}')
+
     if not text.strip():
-        text = '啥也没说'
-    elif '字幕by索兰娅' in text:
-        text = '啥也没说'
+        return '啥也没说'
+    for word in whisper_blacklist:
+        if word in text:
+            return '啥也没说'
+
     return text
 
 
@@ -67,9 +69,9 @@ async def process_voice(message: Message) -> Optional[Message]:
             save_voice(message)
         )
         if message.from_user:
-            user_mention = message.from_user.mention(style="md")
+            user_mention = message.from_user.mention(style=ParseMode.MARKDOWN)
             if message.forward_from:
-                user_mention += ' 🔊 ' + message.forward_from.mention(style="md")
+                user_mention += ' 🔊 ' + message.forward_from.mention(style=ParseMode.MARKDOWN)
         elif message.sender_chat:
             if message.sender_chat.username:
                 user_mention = f'[{message.sender_chat.title}](tg://resolve?domain={message.sender_chat.username})'
