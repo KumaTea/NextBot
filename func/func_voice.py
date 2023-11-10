@@ -3,11 +3,11 @@ import uuid
 import random
 import asyncio
 import logging
+from bot.bot_db import *
 from typing import Optional
 from pyrogram.types import Message
 from bot.bot_info import max_voice
 from cmn.session import gpt, msg_store
-from bot.bot_db import thinking_emojis, whisper_blacklist
 from pyrogram.enums.parse_mode import ParseMode
 
 
@@ -80,7 +80,7 @@ async def process_voice(message: Message) -> Optional[Message]:
         else:
             user_mention = '😎'
         transcription = await transcribe_voice(voice_path)
-        text = user_mention + ':\n' + transcription
+        text = user_mention + ':\n' + transcription + '\n' + voice_tag
         setattr(message, 'transcription', transcription)
         msg_store.add(message)
         return await inform.edit_text(text, parse_mode=ParseMode.MARKDOWN)

@@ -1,6 +1,6 @@
 from typing import Union
 from pyrogram import Client
-from cmn.session import logger
+from bot.bot_db import voice_tag
 from pyrogram.types import Message
 from bot.bot_auth import ensure_not_bl
 from func.func_voice import process_voice
@@ -28,10 +28,13 @@ async def process_msg(client: Client, message: Message) -> Union[Message, None]:
 
     text = message.text
     reply = message.reply_to_message
-    if text and reply:
+    if text:
         try:
-            if reply.from_user.id == self_id:
-                return await replied_chat(client, message)
+            if reply and reply.from_user.id == self_id:
+                if voice_tag in reply.text:
+                    return None
+                else:
+                    return await replied_chat(client, message)
             elif text.startswith(f'@{username}') or text.endswith(f'@{username}'):
                 # mentioning me
                 message.text = text.replace(f'@{username}', '').strip()
