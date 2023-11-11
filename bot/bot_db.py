@@ -105,6 +105,7 @@ whisper_blacklist = [
     '明鏡與點點',
     '明镜与点点',
     '字幕由Amara',
+    '沛隊字幕小組',  # CC字幕 by 沛隊字幕小組
 ]
 
 voice_tag = '#kuma语音王'
