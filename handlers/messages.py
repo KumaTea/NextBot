@@ -1,11 +1,11 @@
 from typing import Union
 from pyrogram import Client
-from bot.bot_db import voice_tag, gpt_auth_info
 from pyrogram.types import Message
-from bot.bot_auth import ensure_not_bl
-from func.func_voice import process_voice
-from bot.bot_info import self_id, username
-from func.func_chat import command_chat, ensure_gpt_auth
+from bot.auth import ensure_not_bl
+from func.voice import process_voice
+from cmn.info import self_id, username
+from cmn.data import voice_tag, gpt_auth_info
+from func.chat import command_chat, ensure_gpt_auth
 
 
 @ensure_gpt_auth

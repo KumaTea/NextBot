@@ -1,12 +1,11 @@
-import os
 import uuid
 import random
 import asyncio
 import logging
-from bot.bot_db import *
+from cmn.data import *
 from typing import Optional
+from cmn.info import max_voice
 from pyrogram.types import Message
-from bot.bot_info import max_voice
 from cmn.session import gpt, msg_store
 from pyrogram.enums.parse_mode import ParseMode
 

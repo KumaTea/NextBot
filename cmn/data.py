@@ -103,9 +103,10 @@ thinking_emojis = list(
 whisper_blacklist = [
     '字幕by索兰娅',
     '明鏡與點點',
-    '明镜与点点',
-    '字幕由Amara',
+    '明镜与点点',  # 请不吝点赞订阅转发打赏支持明镜与点点栏目
+    '字幕由Amara',  # 字幕由Amara.org社区提供 小編字幕由Amara.org社區提供
     '沛隊字幕小組',  # CC字幕 by 沛隊字幕小組
+    'MING PAO',  # MING PAO CANADA MING PAO TORONTO
 ]
 
 voice_tag = '#kuma语音王'

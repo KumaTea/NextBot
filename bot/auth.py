@@ -1,6 +1,7 @@
 import logging
+from typing import Union
 from pyrogram import Client
-from pyrogram.types import Message
+from pyrogram.types import Message, CallbackQuery
 from pyrogram.raw.functions.contacts.get_blocked import GetBlocked
 
 try:
@@ -34,21 +35,11 @@ async def get_blocked_user_ids(client: Client, offset: int = 0, limit: int = 100
 
 
 def ensure_not_bl(func):
-    async def wrapper(client: Client, message: Message):
-        if message.from_user:
-            user_id = message.from_user.id
+    async def wrapper(client: Client, obj: Union[Message, CallbackQuery]):
+        if obj.from_user:
+            user_id = obj.from_user.id
             if user_id in bl_users:
                 logging.warning(f'User {user_id} is in blacklist! Ignoring message.')
                 return None
-            else:
-                return await func(client, message)
-        elif message.sender_chat:
-            if not message.forward_from_chat:
-                return await func(client, message)
-        else:
-            # logging.warning('======= WARNING =======')
-            # logging.warning('[bot_auth]\t\tNo from_user in message!')
-            # logging.warning(f'{message=}')
-            # logging.warning('========  END  ========')
-            return None
+        return await func(client, obj)
     return wrapper

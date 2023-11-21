@@ -1,7 +1,7 @@
 import logging
 import configparser
-from gpt.gpt_auth import gpt_auth  # noqa
-from bot.bot_store import MsgStore
+from gpt.auth import gpt_auth  # noqa
+from bot.store import MsgStore
 from pyrogram import Client as tgClient
 from openai import AsyncClient as aiClient
 

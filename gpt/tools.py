@@ -1,11 +1,11 @@
 import re
-from bot.bot_db import *
+from cmn.data import *
 from gpt.glossary import *
 from cmn.session import logger
 from pprint import PrettyPrinter
 from pyrogram.types import Message
+from cmn.info import self_id, max_dialog
 from pyrogram.parser.parser import Parser
-from bot.bot_info import self_id, max_dialog
 
 
 def trim_command(text: str) -> str:

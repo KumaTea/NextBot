@@ -1,10 +1,10 @@
 import os
 from typing import Union
 from pyrogram import Client
+from cmn.info import gpt_admins
 from pyrogram.types import Message
-from bot.bot_info import gpt_admins
 from pyrogram.enums.parse_mode import ParseMode
-from bot.bot_db import gpt_users_file, gpt_auth_info, bot_debug_info
+from cmn.data import gpt_users_file, gpt_auth_info, bot_debug_info
 from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 
 

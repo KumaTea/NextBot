@@ -1,6 +1,6 @@
 from pyrogram import Client
+from cmn.info import max_dialog
 from pyrogram.types import Message
-from bot.bot_info import max_dialog
 from cmn.session import bot, msg_store, logger
 
 

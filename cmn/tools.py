@@ -1,5 +1,5 @@
 import os
-from bot.bot_db import pwd
+from cmn.data import pwd
 
 
 def sort_imports():
