@@ -35,5 +35,5 @@ async def command_ocr(client: Client, message: Message) -> Message:
     lang = lang
     with open(TASK_FILE, 'a') as f:
         # append task to file
-        f.write(','.join(['ocr', chat_id, reply_id, inform_id, lang]) + '\n')
+        f.write(','.join(list(map(str, ['ocr', chat_id, reply_id, inform_id, lang]))) + '\n')
     return inform

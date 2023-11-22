@@ -24,5 +24,5 @@ async def process_voice(message: Message) -> Message:
     inform_id = inform.id
     with open(TASK_FILE, 'a') as f:
         # append task to file
-        f.write(','.join(['voice', chat_id, voice_id, inform_id]) + '\n')
+        f.write(','.join(list(map(str, ['voice', chat_id, voice_id, inform_id]))) + '\n')
     return inform
