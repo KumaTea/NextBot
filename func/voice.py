@@ -1,4 +1,3 @@
-import uuid
 import random
 import asyncio
 import logging
@@ -8,15 +7,7 @@ from cmn.info import max_voice
 from pyrogram.types import Message
 from cmn.session import gpt, msg_store
 from pyrogram.enums.parse_mode import ParseMode
-
-
-def gen_uuid(length: int = 4) -> str:
-    """
-    Generate a random UUID string.
-    :param length: The length of the UUID string.
-    :return: A random UUID string.
-    """
-    return str(uuid.uuid4())[:length]
+from bot.tools import gen_uuid
 
 
 async def save_voice(message: Message) -> str:

@@ -1,3 +1,4 @@
+import uuid
 from pyrogram import Client
 from cmn.info import max_dialog
 from pyrogram.types import Message
@@ -27,3 +28,12 @@ async def get_dialog(client: Client, message: Message) -> list[Message]:
         if dialog_count >= max_dialog:
             break
     return dialog
+
+
+def gen_uuid(length: int = 4) -> str:
+    """
+    Generate a random UUID string.
+    :param length: The length of the UUID string.
+    :return: A random UUID string.
+    """
+    return str(uuid.uuid4())[:length]
