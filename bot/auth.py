@@ -41,5 +41,12 @@ def ensure_not_bl(func):
             if user_id in bl_users:
                 logging.warning(f'User {user_id} is in blacklist! Ignoring message.')
                 return None
+        if isinstance(obj, Message):
+            if obj.reply_to_message:
+                if obj.reply_to_message.from_user:
+                    user_id = obj.reply_to_message.from_user.id
+                    if user_id in bl_users:
+                        logging.warning(f'Replied user {user_id} is in blacklist! Ignoring message.')
+                        return None
         return await func(client, obj)
     return wrapper
