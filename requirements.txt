@@ -1,6 +1,8 @@
+flask
 openai>=1.0.0
 requests
 pyrogram
+gunicorn
 uvloop; sys_platform != 'win32'
 
 # conda

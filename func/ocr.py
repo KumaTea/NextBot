@@ -1,29 +1,20 @@
-import os
-import asyncio
 import requests
 from pyrogram import Client
-from cmn.data import TEMP_DIR
-from bot.tools import gen_uuid
 from bot.auth import ensure_not_bl
 from pyrogram.types import Message
 from pyrogram.enums.parse_mode import ParseMode
 
 
-API = 'http://172.21.45.250:14500/ocr'
+LOCAL_API = 'http://127.0.0.1:13600/ocr'
 CJK = ['ch', 'korean', 'japan', 'chinese_cht']
 LATIN = ['en', 'fr', 'german']
 SUPPORT = CJK + LATIN
 
 
 @ensure_not_bl
-async def command_ocr(client: Client, message: Message) -> Message:
+async def command_ocr(client: Client, message: Message):
     reply = message.reply_to_message
-    msg = None
-    if reply and reply.photo:
-        msg = reply
-    elif message.photo:
-        msg = message
-    if not msg:
+    if not (reply and reply.photo):
         return await message.reply_text('请回复一张图片。', quote=False)
 
     text = message.text
@@ -37,25 +28,14 @@ async def command_ocr(client: Client, message: Message) -> Message:
         else:
             inform_text += f'\n未知的语言参数(`{SUPPORT=}`)，使用默认值 `ch`。'
 
-    while 'ocr' in ' '.join(os.listdir(TEMP_DIR)):
-        await asyncio.sleep(1)
-    filename = f'/dev/shm/ocr-{gen_uuid()}.png'
-    dl, inform = await asyncio.gather(
-        msg.download(filename),
-        message.reply_text(inform_text, quote=False, parse_mode=ParseMode.MARKDOWN)
+    inform = await message.reply_text(inform_text, quote=False, parse_mode=ParseMode.MARKDOWN)
+    r = requests.get(
+        LOCAL_API,
+        params={
+            'chat_id': message.chat.id,
+            'reply_id': reply.id,
+            'inform_id': inform.id,
+            'lang': lang
+        }
     )
-
-    try:
-        with open(filename, 'rb') as f:
-            files = {'image': f}
-            values = {'lang': lang}
-            r = requests.post(API, files=files, data=values)
-            result = r.json()['result']
-            text = f'```\n{result}\n```'
-            to_return = await inform.edit_text(text, parse_mode=ParseMode.MARKDOWN)
-    except Exception as e:
-        to_return = await inform.edit_text(f'Error: `{e}`', parse_mode=ParseMode.MARKDOWN)
-    finally:
-        os.remove(filename)
-
-    return to_return
+    return r
