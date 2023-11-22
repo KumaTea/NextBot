@@ -21,6 +21,13 @@ def is_same_line(box1: list, box2: list, img_size: tuple, threshold: float = 0.0
     # box2 = [[836.0, 636.0], [863.0, 636.0], [863.0, 655.0], [836.0, 655.0]]
     # img_size = [1920, 1080]
 
+    image_width = img_size[0]
+    box1_right = (box1[1][0] + box1[2][0]) / 2
+    box2_left = (box2[0][0] + box2[3][0]) / 2
+    judge_0 = box1_right - box2_left > threshold * 5 * image_width
+    if judge_0:  # 框1右边界 > 框2左边界 ==> 框1在框2右边
+        return False
+
     image_height = img_size[1]
     box1_y1 = (box1[0][1] + box1[1][1]) / 2
     box1_y2 = (box1[2][1] + box1[3][1]) / 2
@@ -76,5 +83,5 @@ if __name__ == '__main__':
     image_size = get_image_resolution(img_path)
     processed = process_result(ocr_result, image_size, args.lang)
 
-    with open(args.output, 'w') as f:
+    with open(args.output, 'w', encoding='utf-8') as f:
         f.write(processed)

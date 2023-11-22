@@ -1,18 +1,21 @@
 import os
 import time
+import uuid
 import subprocess
+
+
+def gen_uuid(length: int = 4) -> str:
+    return str(uuid.uuid4())[:length]
+
 
 
 def ocr_handler(img_bytes: bytes, lang: str = 'ch'):
     result = ''
     status = 200
 
-    filename = f'/dev/shm/{int(time.time())}.png'
-    output = f'/dev/shm/{int(time.time())}.txt'
-    while os.path.exists(filename) or os.path.exists(output):
-        time.sleep(0.1)
-        filename = f'/dev/shm/{int(time.time())}.png'
-        output = f'/dev/shm/{int(time.time())}.txt'
+    generated = gen_uuid()
+    filename = f'/dev/shm/{generated}.png'
+    output = f'/dev/shm/{generated}.txt'
 
     with open(filename, 'wb') as f:
         f.write(img_bytes)

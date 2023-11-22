@@ -18,7 +18,7 @@ SUPPORT = CJK + LATIN
 async def command_ocr(client: Client, message: Message) -> Message:
     reply = message.reply_to_message
     msg = None
-    if reply.photo:
+    if reply and reply.photo:
         msg = reply
     elif message.photo:
         msg = message
@@ -36,6 +36,8 @@ async def command_ocr(client: Client, message: Message) -> Message:
         else:
             inform_text += f'\n未知的语言参数(`{SUPPORT=}`)，使用默认值 `ch`。'
 
+    while 'ocr' in ' '.join(os.listdir('/dev/shm')):
+        await asyncio.sleep(1)
     filename = f'/dev/shm/ocr-{gen_uuid()}.png'
     dl, inform = await asyncio.gather(
         msg.download(filename),
@@ -51,7 +53,7 @@ async def command_ocr(client: Client, message: Message) -> Message:
             text = f'```\n{result}\n```'
             to_return = await inform.edit_text(text, parse_mode=ParseMode.MARKDOWN)
     except Exception as e:
-        to_return = await inform.edit_text(f'Error: {e}')
+        to_return = await inform.edit_text(f'Error: `{e}`', parse_mode=ParseMode.MARKDOWN)
     finally:
         os.remove(filename)
 
