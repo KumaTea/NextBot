@@ -1,5 +1,4 @@
 import logging
-from bot.session import bot
 from flask import Flask, request
 from mbot.handler import ocr_handler, voice_handler
 
@@ -10,7 +9,6 @@ logging.basicConfig(
     datefmt='%Y-%m-%d %H:%M:%S')
 logger = logging.getLogger(__name__)
 
-bot.start()
 app = Flask(__name__)
 
 
