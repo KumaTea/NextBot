@@ -24,6 +24,7 @@ async def process_ocr(chat_id: int, reply_id: int, inform_id: int, lang: str = '
     filename = f'/dev/shm/ocr-{gen_uuid()}.png'
     await reply.download(filename)
 
+    to_return = None
     try:
         with open(filename, 'rb') as f:
             files = {'image': f}
@@ -33,7 +34,8 @@ async def process_ocr(chat_id: int, reply_id: int, inform_id: int, lang: str = '
             text = f'```\n{result}\n```'
             to_return = await inform.edit_text(text, parse_mode=ParseMode.MARKDOWN)
     except Exception as e:
-        to_return = await inform.edit_text(f'Error: `{e}`', parse_mode=ParseMode.MARKDOWN)
+        if 'MESSAGE_NOT_MODIFIED' not in str(e):
+            to_return = await inform.edit_text(f'Error: `{e}`', parse_mode=ParseMode.MARKDOWN)
     finally:
         os.remove(filename)
 
