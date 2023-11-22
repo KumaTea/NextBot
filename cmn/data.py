@@ -110,6 +110,7 @@ whisper_blacklist = [
     '字幕由Amara',  # 字幕由Amara.org社区提供 小編字幕由Amara.org社區提供
     '沛隊字幕小組',  # CC字幕 by 沛隊字幕小組
     'MING PAO',  # MING PAO CANADA MING PAO TORONTO
+    '訂閱我們的頻道',  # 也請別忘了分享出去並按一個讚哦 並且記得訂閱我們的頻道 才能收到最新消息喔
 ]
 
 voice_tag = '#kuma语音王'

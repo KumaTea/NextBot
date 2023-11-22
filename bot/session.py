@@ -3,7 +3,6 @@ import configparser
 from gpt.auth import gpt_auth  # noqa
 from bot.store import MsgStore
 from pyrogram import Client as tgClient
-from openai import Client as aiSyncClient
 from openai import AsyncClient as aiClient
 
 
@@ -24,11 +23,6 @@ bot = tgClient(
 )
 
 gpt = aiClient(
-    api_key=config['openai']['api_key'],
-    organization=config['openai']['organization']
-)
-
-sync_gpt = aiSyncClient(
     api_key=config['openai']['api_key'],
     organization=config['openai']['organization']
 )

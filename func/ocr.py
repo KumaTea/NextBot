@@ -1,18 +1,18 @@
-import requests
 from pyrogram import Client
 from bot.auth import ensure_not_bl
 from pyrogram.types import Message
 from pyrogram.enums.parse_mode import ParseMode
+from cmn.data import TEMP_DIR
 
 
-LOCAL_API = 'http://127.0.0.1:13600/ocr'
 CJK = ['ch', 'korean', 'japan', 'chinese_cht']
 LATIN = ['en', 'fr', 'german']
 SUPPORT = CJK + LATIN
+TASK_FILE = f'{TEMP_DIR}/task.txt'
 
 
 @ensure_not_bl
-async def command_ocr(client: Client, message: Message):
+async def command_ocr(client: Client, message: Message) -> Message:
     reply = message.reply_to_message
     if not (reply and reply.photo):
         return await message.reply_text('请回复一张图片。', quote=False)
@@ -29,13 +29,11 @@ async def command_ocr(client: Client, message: Message):
             inform_text += f'\n未知的语言参数(`{SUPPORT=}`)，使用默认值 `ch`。'
 
     inform = await message.reply_text(inform_text, quote=False, parse_mode=ParseMode.MARKDOWN)
-    r = requests.get(
-        LOCAL_API,
-        params={
-            'chat_id': message.chat.id,
-            'reply_id': reply.id,
-            'inform_id': inform.id,
-            'lang': lang
-        }
-    )
-    return r
+    chat_id = message.chat.id
+    reply_id = reply.id
+    inform_id = inform.id
+    lang = lang
+    with open(TASK_FILE, 'a') as f:
+        # append task to file
+        f.write(','.join(['ocr', chat_id, reply_id, inform_id, lang]) + '\n')
+    return inform

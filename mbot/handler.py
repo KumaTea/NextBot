@@ -1,15 +1,29 @@
-from threading import Thread
+import os
+import asyncio
 from mbot.ocr import process_ocr
 from mbot.voice import process_voice
+from cmn.data import TEMP_DIR
 
 
-def ocr_handler(chat_id: int, reply_id: int, inform_id: int, lang: str = 'ch'):
-    t = Thread(target=process_ocr, args=(chat_id, reply_id, inform_id, lang))
-    t.start()
-    return 'OK'
+TASK_FILE = f'{TEMP_DIR}/task.txt'
 
 
-def voice_handler(chat_id: int, voice_id: int, inform_id: int):
-    t = Thread(target=process_voice, args=(chat_id, voice_id, inform_id))
-    t.start()
-    return 'OK'
+async def process_task(task: str):
+    if task.startswith('ocr'):
+        task_name, chat_id, reply_id, inform_id, lang = task.split(',')
+        return await process_ocr(int(chat_id), int(reply_id), int(inform_id), lang)
+    elif task.startswith('voice'):
+        task_name, chat_id, reply_id, inform_id = task.split(',')
+        return await process_voice(int(chat_id), int(reply_id), int(inform_id))
+
+
+async def handler():
+    while True:
+        if os.path.isfile(TASK_FILE):
+            with open(TASK_FILE, 'r') as f:
+                tasks = f.read()
+            os.remove(TASK_FILE)
+            for task in tasks.splitlines():
+                if task:
+                    await process_task(task)
+        await asyncio.sleep(1)

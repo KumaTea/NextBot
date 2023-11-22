@@ -1,13 +1,13 @@
+import asyncio
 import logging
 from cmn.data import *
 from bot.tools import gen_uuid
-from bot.session import sync_gpt
+from bot.session import bot, gpt
 from pyrogram.types import Message
 from pyrogram.enums.parse_mode import ParseMode
-from mbot.common import set_work, set_free
 
 
-def save_voice(message: Message) -> str:
+async def save_voice(message: Message) -> str:
     """
     Save the voice message to a file.
     :param message: The message object.
@@ -15,13 +15,13 @@ def save_voice(message: Message) -> str:
     """
     file_name = gen_uuid()
     file_path = f'/dev/shm/{file_name}.ogg'
-    message.download(file_path)
+    await message.download(file_path)
     return file_path
 
 
-def transcribe_voice(voice_path: str) -> str:
+async def transcribe_voice(voice_path: str) -> str:
     with open(voice_path, 'rb') as voice:
-        transcript = sync_gpt.audio.transcriptions.create(
+        transcript = await gpt.audio.transcriptions.create(
             model='whisper-1',
             file=voice,
             language='zh'
@@ -38,45 +38,39 @@ def transcribe_voice(voice_path: str) -> str:
     return text
 
 
-def process_voice(chat_id: int, voice_id: int, inform_id: int):
-    set_work()
+async def process_voice(chat_id: int, voice_id: int, inform_id: int):
+    message, inform = await asyncio.gather(
+        bot.get_messages(chat_id, voice_id),
+        bot.get_messages(chat_id, inform_id)
+    )
+    voice_path = None
 
-    from bot.session import bot
-    with bot:
+    try:
+        voice_path = await save_voice(message)
 
-        message = bot.get_messages(chat_id, voice_id)
-        inform = bot.get_messages(chat_id, inform_id)
-        voice_path = None
-
-        try:
-            voice_path = save_voice(message)
-
-            if message.from_user:
-                user_mention = message.from_user.mention(style=ParseMode.MARKDOWN)
-                if message.forward_from:
-                    user_mention += ' 🔊 ' + message.forward_from.mention(style=ParseMode.MARKDOWN)
-            elif message.sender_chat:
-                if message.sender_chat.username:
-                    user_mention = f'[{message.sender_chat.title}](tg://resolve?domain={message.sender_chat.username})'
-                else:
-                    user_mention = message.sender_chat.title
+        if message.from_user:
+            user_mention = message.from_user.mention(style=ParseMode.MARKDOWN)
+            if message.forward_from:
+                user_mention += ' 🔊 ' + message.forward_from.mention(style=ParseMode.MARKDOWN)
+        elif message.sender_chat:
+            if message.sender_chat.username:
+                user_mention = f'[{message.sender_chat.title}](tg://resolve?domain={message.sender_chat.username})'
             else:
-                user_mention = '😎'
+                user_mention = message.sender_chat.title
+        else:
+            user_mention = '😎'
 
-            transcription = transcribe_voice(voice_path)
-            text = user_mention + ':\n' + transcription + '\n' + voice_tag
-            # setattr(message, 'transcription', transcription)
-            # msg_store.add(message)
-            inform = inform.edit_text(text, parse_mode=ParseMode.MARKDOWN)
-        except Exception as e:
-            logging.warning(f'[func_voice]\tERROR!!!')
-            logging.warning(f'[func_voice]\t{e}')
-            inform = inform.edit_text('听不懂捏')
-        finally:
-            if voice_path and os.path.isfile(voice_path):
-                os.remove(voice_path)
+        transcription = await transcribe_voice(voice_path)
+        text = user_mention + ':\n' + transcription + '\n' + voice_tag
+        # setattr(message, 'transcription', transcription)
+        # msg_store.add(message)
+        inform = await inform.edit_text(text, parse_mode=ParseMode.MARKDOWN)
+    except Exception as e:
+        logging.warning(f'[func_voice]\tERROR!!!')
+        logging.warning(f'[func_voice]\t{e}')
+        inform = await inform.edit_text('听不懂捏')
+    finally:
+        if voice_path and os.path.isfile(voice_path):
+            os.remove(voice_path)
 
-    del bot
-
-    set_free()
     return inform
