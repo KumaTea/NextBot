@@ -1,8 +1,8 @@
 import os
 import asyncio
+from cmn.data import TEMP_DIR
 from mbot.ocr import process_ocr
 from mbot.voice import process_voice
-from cmn.data import TEMP_DIR
 
 
 TASK_FILE = f'{TEMP_DIR}/task.txt'

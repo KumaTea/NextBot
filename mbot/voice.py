@@ -2,7 +2,8 @@ import asyncio
 import logging
 from cmn.data import *
 from bot.tools import gen_uuid
-from bot.session import bot, gpt
+from bot.session import gpt
+from mbot.session import bot
 from pyrogram.types import Message
 from pyrogram.enums.parse_mode import ParseMode
 

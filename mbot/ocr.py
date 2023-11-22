@@ -2,11 +2,11 @@ import os
 import time
 import asyncio
 import requests
+from mbot.session import bot
 from cmn.data import TEMP_DIR
 from bot.tools import gen_uuid
 from pyrogram.types import Message
 from pyrogram.enums.parse_mode import ParseMode
-from bot.session import bot
 
 
 API = 'http://172.21.45.250:14500/ocr'

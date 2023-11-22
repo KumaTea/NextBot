@@ -1,8 +1,8 @@
 import random
 from cmn.data import *
+from cmn.data import TEMP_DIR
 from cmn.info import max_voice
 from pyrogram.types import Message
-from cmn.data import TEMP_DIR
 
 
 TASK_FILE = f'{TEMP_DIR}/task.txt'
