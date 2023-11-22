@@ -4,10 +4,10 @@ import logging
 from cmn.data import *
 from typing import Optional
 from cmn.info import max_voice
-from pyrogram.types import Message
-from cmn.session import gpt, msg_store
-from pyrogram.enums.parse_mode import ParseMode
 from bot.tools import gen_uuid
+from pyrogram.types import Message
+from bot.session import gpt, msg_store
+from pyrogram.enums.parse_mode import ParseMode
 
 
 async def save_voice(message: Message) -> str:

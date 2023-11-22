@@ -1,5 +1,5 @@
 import logging
-from cmn.session import msg_store
+from bot.session import msg_store
 
 
 def stopping():

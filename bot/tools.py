@@ -2,7 +2,7 @@ import uuid
 from pyrogram import Client
 from cmn.info import max_dialog
 from pyrogram.types import Message
-from cmn.session import bot, msg_store, logger
+from bot.session import bot, msg_store, logger
 
 
 async def get_message(chat_id: int, msg_id: int, client: Client = bot) -> Message:

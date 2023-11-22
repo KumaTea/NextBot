@@ -13,7 +13,7 @@ except ImportError:
     trusted_group = []
     bl_users = []
 
-# from cmn.session import config
+# from bot.session import config
 #
 # me = Client(
 #     'me',

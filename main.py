@@ -6,7 +6,7 @@ if os.name == 'posix':
 
 from bot.starting import starting
 from bot.stopping import stopping
-from cmn.session import bot, logger
+from bot.session import bot, logger
 
 
 starting()

@@ -1,7 +1,7 @@
 import re
 from cmn.data import *
 from gpt.glossary import *
-from cmn.session import logger
+from bot.session import logger
 from pprint import PrettyPrinter
 from pyrogram.types import Message
 from cmn.info import self_id, max_dialog

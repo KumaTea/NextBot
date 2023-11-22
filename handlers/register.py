@@ -1,5 +1,5 @@
 from cmn.data import *
-from cmn.session import bot
+from bot.session import bot
 from pyrogram import filters
 from handlers.functions import *
 from handlers.messages import process_msg

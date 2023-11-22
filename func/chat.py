@@ -6,7 +6,7 @@ from bot.tools import get_dialog
 from bot.auth import ensure_not_bl
 from gpt.auth import ensure_gpt_auth
 from typing import Union, AsyncGenerator
-from cmn.session import gpt_auth, msg_store
+from bot.session import gpt_auth, msg_store
 from gpt.core import stream_chat_by_sentences
 from pyrogram.enums.parse_mode import ParseMode
 from cmn.data import smart_inst, thinking_emojis

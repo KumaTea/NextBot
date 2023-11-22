@@ -1,4 +1,4 @@
-from cmn.session import *
+from bot.session import *
 from typing import AsyncGenerator
 
 

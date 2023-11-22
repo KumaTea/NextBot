@@ -1,10 +1,11 @@
 import os
 import asyncio
+import requests
 from pyrogram import Client
+from cmn.data import TEMP_DIR
+from bot.tools import gen_uuid
 from bot.auth import ensure_not_bl
 from pyrogram.types import Message
-import requests
-from bot.tools import gen_uuid
 from pyrogram.enums.parse_mode import ParseMode
 
 
@@ -36,7 +37,7 @@ async def command_ocr(client: Client, message: Message) -> Message:
         else:
             inform_text += f'\n未知的语言参数(`{SUPPORT=}`)，使用默认值 `ch`。'
 
-    while 'ocr' in ' '.join(os.listdir('/dev/shm')):
+    while 'ocr' in ' '.join(os.listdir(TEMP_DIR)):
         await asyncio.sleep(1)
     filename = f'/dev/shm/ocr-{gen_uuid()}.png'
     dl, inform = await asyncio.gather(
