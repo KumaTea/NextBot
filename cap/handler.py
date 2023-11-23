@@ -25,6 +25,9 @@ def ocr_handler(img_bytes: bytes, lang: str = 'ch'):
         subprocess.run(command.split(), stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         with open(output, 'r') as f:
             result = f.read()
+    except FileNotFoundError:
+        result = '未能识别出任何文字。'
+        status = 500
     except Exception as e:
         result = str(e)
         status = 500

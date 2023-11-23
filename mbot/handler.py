@@ -1,6 +1,7 @@
 import os
 import asyncio
 from cmn.data import TEMP_DIR
+from bot.session import logger
 from mbot.ocr import process_ocr
 from mbot.voice import process_voice
 
@@ -25,5 +26,11 @@ async def handler():
             os.remove(TASK_FILE)
             for task in tasks.splitlines():
                 if task:
-                    await process_task(task)
+                    try:
+                        await process_task(task)
+                    except RuntimeError as e:
+                        if 'Event loop is closed' in str(e):
+                            logger.error('Event loop is closed')
+                            logger.error('Rebooting...')
+                            return os.system("kill $(ps aux | grep tail | head -n 1 | awk '{print $2}')")
         await asyncio.sleep(30)
