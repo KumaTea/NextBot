@@ -24,8 +24,8 @@ async def process_ocr(chat_id: int, reply_id: int, inform_id: int, lang: str = '
     try:
         await reply.download(filename)
     except ValueError as e:
-        if 'any downloadable' in str(e):
-            return await inform.edit_text('Error: `No downloadable media found.`', parse_mode=ParseMode.MARKDOWN)
+        if 'downloadable' in str(e):
+            return await inform.edit_text('看不到图，可以试试重新拉我进群。', parse_mode=ParseMode.MARKDOWN)
     except Exception as e:
         return await inform.edit_text(f'Error: `{e}`', parse_mode=ParseMode.MARKDOWN)
 

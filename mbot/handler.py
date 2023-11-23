@@ -1,9 +1,9 @@
 import os
 import asyncio
-from cmn.data import TEMP_DIR
 from bot.session import logger
 from mbot.ocr import process_ocr
 from mbot.voice import process_voice
+from cmn.data import TEMP_DIR, REBOOT_CMD
 
 
 TASK_FILE = f'{TEMP_DIR}/task.txt'
@@ -32,5 +32,5 @@ async def handler():
                         if 'Event loop is closed' in str(e):
                             logger.error('Event loop is closed')
                             logger.error('Rebooting...')
-                            return os.system("kill $(ps aux | grep tail | head -n 1 | awk '{print $2}')")
+                            return os.system(REBOOT_CMD)
         await asyncio.sleep(30)
