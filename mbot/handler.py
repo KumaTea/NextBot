@@ -26,4 +26,4 @@ async def handler():
             for task in tasks.splitlines():
                 if task:
                     await process_task(task)
-        await asyncio.sleep(1)
+        await asyncio.sleep(30)

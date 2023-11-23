@@ -1,5 +1,4 @@
 import os
-import time
 import asyncio
 import requests
 from mbot.session import bot
@@ -9,7 +8,7 @@ from pyrogram.types import Message
 from pyrogram.enums.parse_mode import ParseMode
 
 
-API = 'http://172.21.45.250:14500/ocr'
+API = 'https://cap.kmtea.eu/ocr'
 
 
 async def process_ocr(chat_id: int, reply_id: int, inform_id: int, lang: str = 'ch') -> Message:
@@ -19,7 +18,7 @@ async def process_ocr(chat_id: int, reply_id: int, inform_id: int, lang: str = '
     )
 
     while 'ocr' in ' '.join(os.listdir(TEMP_DIR)):
-        time.sleep(1)
+        await asyncio.sleep(1)
 
     filename = f'/dev/shm/ocr-{gen_uuid()}.png'
     await reply.download(filename)
