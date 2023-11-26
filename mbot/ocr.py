@@ -1,7 +1,7 @@
 import os
 import asyncio
 import requests
-from mbot.session import bot
+from pyrogram import Client
 from cmn.data import TEMP_DIR
 from bot.tools import gen_uuid
 from pyrogram.types import Message
@@ -11,7 +11,7 @@ from pyrogram.enums.parse_mode import ParseMode
 API = 'https://cap.kmtea.eu/ocr'
 
 
-async def process_ocr(chat_id: int, reply_id: int, inform_id: int, lang: str = 'ch') -> Message:
+async def process_ocr(bot: Client, chat_id: int, reply_id: int, inform_id: int, lang: str = 'ch') -> Message:
     reply, inform = await asyncio.gather(
         bot.get_messages(chat_id, reply_id),
         bot.get_messages(chat_id, inform_id)

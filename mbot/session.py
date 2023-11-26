@@ -1,11 +1,11 @@
 import configparser
-from pyrogram import Client as tgClient
+from pyrogram import Client
 
 
 config = configparser.ConfigParser()
 config.read('config.ini')
 
-bot = tgClient(
+bot = Client(
     'media',
     api_id=config['tg']['api_id'],
     api_hash=config['tg']['api_hash'],

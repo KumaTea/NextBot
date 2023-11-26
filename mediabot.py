@@ -5,7 +5,7 @@ from mbot.handler import handler
 
 async def main():
     async with bot:
-        await handler()
+        await handler(bot)
 
 
 if __name__ == '__main__':

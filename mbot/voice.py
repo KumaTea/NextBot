@@ -1,6 +1,6 @@
 import asyncio
 from cmn.data import *
-from mbot.session import bot
+from pyrogram import Client
 from bot.tools import gen_uuid
 from pyrogram.types import Message
 from bot.session import gpt, logger
@@ -38,7 +38,7 @@ async def transcribe_voice(voice_path: str) -> str:
     return text
 
 
-async def process_voice(chat_id: int, voice_id: int, inform_id: int):
+async def process_voice(bot: Client, chat_id: int, voice_id: int, inform_id: int):
     message, inform = await asyncio.gather(
         bot.get_messages(chat_id, voice_id),
         bot.get_messages(chat_id, inform_id)

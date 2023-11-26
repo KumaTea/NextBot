@@ -1,5 +1,6 @@
 import os
 from pathlib import Path
+from pyrogram import Client
 from bot.session import logger
 from mbot.ocr import process_ocr
 from mbot.voice import process_voice
@@ -10,16 +11,16 @@ TASK_FILE = f'{TEMP_DIR}/task.txt'
 STATUS_FILE = f'{TEMP_DIR}/media.run'
 
 
-async def process_task(task: str):
+async def process_task(bot: Client, task: str):
     if task.startswith('ocr'):
         task_name, chat_id, reply_id, inform_id, lang = task.split(',')
-        return await process_ocr(int(chat_id), int(reply_id), int(inform_id), lang)
+        return await process_ocr(bot, int(chat_id), int(reply_id), int(inform_id), lang)
     elif task.startswith('voice'):
         task_name, chat_id, reply_id, inform_id = task.split(',')
-        return await process_voice(int(chat_id), int(reply_id), int(inform_id))
+        return await process_voice(bot, int(chat_id), int(reply_id), int(inform_id))
 
 
-async def handler():
+async def handler(bot: Client):
     Path(STATUS_FILE).touch()
     try:
         if os.path.isfile(TASK_FILE):
@@ -29,7 +30,7 @@ async def handler():
             for task in tasks.splitlines():
                 if task:
                     try:
-                        await process_task(task)
+                        await process_task(bot, task)
                     except RuntimeError as e:
                         if 'Event loop is closed' in str(e):
                             logger.error('Event loop is closed')
