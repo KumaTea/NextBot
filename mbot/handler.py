@@ -1,5 +1,5 @@
 import os
-import asyncio
+from pathlib import Path
 from bot.session import logger
 from mbot.ocr import process_ocr
 from mbot.voice import process_voice
@@ -7,6 +7,7 @@ from cmn.data import TEMP_DIR, REBOOT_CMD
 
 
 TASK_FILE = f'{TEMP_DIR}/task.txt'
+STATUS_FILE = f'{TEMP_DIR}/media.run'
 
 
 async def process_task(task: str):
@@ -19,7 +20,8 @@ async def process_task(task: str):
 
 
 async def handler():
-    while True:
+    Path(STATUS_FILE).touch()
+    try:
         if os.path.isfile(TASK_FILE):
             with open(TASK_FILE, 'r') as f:
                 tasks = f.read()
@@ -33,4 +35,7 @@ async def handler():
                             logger.error('Event loop is closed')
                             logger.error('Rebooting...')
                             return os.system(REBOOT_CMD)
-        await asyncio.sleep(30)
+    except Exception as e:
+        logger.error(e)
+    finally:
+        os.remove(STATUS_FILE)

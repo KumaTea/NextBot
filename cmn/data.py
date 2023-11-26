@@ -117,3 +117,5 @@ whisper_blacklist = [
 ]
 
 voice_tag = '#kuma语音王'
+
+MEDIA_BOT_CMD = '/opt/conda/envs/rbsk/bin/python3 mediabot.py >> /tmp/media.log 2>&1'

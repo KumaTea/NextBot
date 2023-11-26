@@ -1,7 +1,9 @@
+import os
+import asyncio
 from pyrogram import Client
-from cmn.data import TEMP_DIR
 from bot.auth import ensure_not_bl
 from pyrogram.types import Message
+from cmn.data import TEMP_DIR, MEDIA_BOT_CMD
 from pyrogram.enums.parse_mode import ParseMode
 
 
@@ -9,6 +11,7 @@ CJK = ['ch', 'korean', 'japan', 'chinese_cht']
 LATIN = ['en', 'fr', 'german']
 SUPPORT = CJK + LATIN
 TASK_FILE = f'{TEMP_DIR}/task.txt'
+STATUS_FILE = f'{TEMP_DIR}/media.run'
 
 
 @ensure_not_bl
@@ -36,4 +39,8 @@ async def command_ocr(client: Client, message: Message) -> Message:
     with open(TASK_FILE, 'a') as f:
         # append task to file
         f.write(','.join(list(map(str, ['ocr', chat_id, reply_id, inform_id, lang]))) + '\n')
+
+    while os.path.isfile(STATUS_FILE):
+        await asyncio.sleep(1)
+    await asyncio.create_subprocess_shell(MEDIA_BOT_CMD)
     return inform

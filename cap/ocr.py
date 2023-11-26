@@ -4,12 +4,10 @@ from paddleocr import PaddleOCR
 
 
 CJK = ['ch', 'korean', 'japan', 'chinese_cht']
+LATIN = ['en', 'fr', 'german']
+SUPPORT = CJK + LATIN
 
-
-arg = argparse.ArgumentParser()
-arg.add_argument('-i', '--input', help='input image path')
-arg.add_argument('-o', '--output', help='output text path')
-arg.add_argument('-l', '--lang', help='language', default='ch')
+ocrs = {}
 
 
 def get_image_resolution(img: str):
@@ -74,14 +72,26 @@ def process_result(result: list, img_size: tuple, lang: str = 'ch'):
     return result_text
 
 
-if __name__ == '__main__':
-    args = arg.parse_args()
-    img_path = args.input
+def do_ocr(input_file, lang='ch'):
+    if lang not in ocrs:
+        ocrs[lang] = PaddleOCR(use_angle_cls=True, lang=lang)
+    ocr = ocrs[lang]
+    ocr_result = ocr.ocr(input_file, cls=True)
+    image_size = get_image_resolution(input_file)
+    processed = process_result(ocr_result, image_size, lang)
+    return processed
 
-    ocr = PaddleOCR(use_angle_cls=True, lang=args.lang)
-    ocr_result = ocr.ocr(img_path, cls=True)
-    image_size = get_image_resolution(img_path)
-    processed = process_result(ocr_result, image_size, args.lang)
 
-    with open(args.output, 'w', encoding='utf-8') as f:
+def ocr_main(input_file, output_file, lang='ch'):
+    processed = do_ocr(input_file, lang)
+    with open(output_file, 'w', encoding='utf-8') as f:
         f.write(processed)
+
+
+if __name__ == '__main__':
+    arg = argparse.ArgumentParser()
+    arg.add_argument('-i', '--input', help='input image path')
+    arg.add_argument('-o', '--output', help='output text path')
+    arg.add_argument('-l', '--lang', help='language', default='ch')
+    args = arg.parse_args()
+    ocr_main(args.input, args.output, args.lang)
