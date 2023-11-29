@@ -1,5 +1,8 @@
 from mbot.session import bot
-from mbot.handler import handler
+from mbot.handler import handler, STATUS_FILE, StatHolder
+
+
+holder = StatHolder(STATUS_FILE)
 
 
 async def main():
@@ -8,4 +11,5 @@ async def main():
 
 
 if __name__ == '__main__':
-    bot.run(main())
+    with holder:
+        bot.run(main())

@@ -1,15 +1,15 @@
-import logging
 from typing import Union
 from pyrogram import Client
+from bot.session import logger
 from pyrogram.types import Message, CallbackQuery
 from pyrogram.raw.functions.contacts.get_blocked import GetBlocked
 
 try:
     from local_db import trusted_group, bl_users
 except ImportError:
-    logging.warning('======== WARNING ========')
-    logging.warning('[bot_auth]\t\tImportError')
-    logging.warning('========  END  ========')
+    logger.warning('======== WARNING ========')
+    logger.warning('[bot_auth]\t\tImportError')
+    logger.warning('========  END  ========')
     trusted_group = []
     bl_users = []
 
@@ -39,14 +39,14 @@ def ensure_not_bl(func):
         if obj.from_user:
             user_id = obj.from_user.id
             if user_id in bl_users:
-                logging.warning(f'User {user_id} is in blacklist! Ignoring message.')
+                logger.warning(f'User {user_id} is in blacklist! Ignoring message.')
                 return None
         if isinstance(obj, Message):
             if obj.reply_to_message:
                 if obj.reply_to_message.from_user:
                     user_id = obj.reply_to_message.from_user.id
                     if user_id in bl_users:
-                        logging.warning(f'Replied user {user_id} is in blacklist! Ignoring message.')
+                        logger.warning(f'Replied user {user_id} is in blacklist! Ignoring message.')
                         return None
         return await func(client, obj)
     return wrapper

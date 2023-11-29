@@ -1,4 +1,5 @@
 import os
+import time
 from pathlib import Path
 from pyrogram import Client
 from bot.session import logger
@@ -20,8 +21,25 @@ async def process_task(bot: Client, task: str):
         return await process_voice(bot, int(chat_id), int(reply_id), int(inform_id))
 
 
+class StatHolder:
+    def __init__(self, sign: str, delay: int = 1):
+        self.sign = sign
+        self.delay = delay
+        self.pid = os.getpid()
+
+    def __enter__(self):
+        while os.path.isfile(self.sign):
+            logger.info(f'Media bot pid={self.pid} waiting...')
+            time.sleep(self.delay)
+        Path(self.sign).touch()
+        logger.info(f'Media bot pid={self.pid} started!')
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        os.remove(self.sign)
+        logger.info(f'Media bot pid={self.pid} stopped.')
+
+
 async def handler(bot: Client):
-    Path(STATUS_FILE).touch()
     try:
         if os.path.isfile(TASK_FILE):
             with open(TASK_FILE, 'r') as f:
@@ -38,5 +56,3 @@ async def handler(bot: Client):
                             return os.system(REBOOT_CMD)
     except Exception as e:
         logger.error(e)
-    finally:
-        os.remove(STATUS_FILE)
