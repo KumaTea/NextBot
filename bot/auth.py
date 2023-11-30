@@ -5,13 +5,14 @@ from pyrogram.types import Message, CallbackQuery
 from pyrogram.raw.functions.contacts.get_blocked import GetBlocked
 
 try:
-    from local_db import trusted_group, bl_users
+    from local_db import trusted_group, bl_users, known_group
 except ImportError:
     logger.warning('======== WARNING ========')
     logger.warning('[bot_auth]\t\tImportError')
     logger.warning('========  END  ========')
     trusted_group = []
     bl_users = []
+    known_group = []
 
 # from bot.session import config
 #
@@ -36,6 +37,8 @@ async def get_blocked_user_ids(client: Client, offset: int = 0, limit: int = 100
 
 def ensure_not_bl(func):
     async def wrapper(client: Client, obj: Union[Message, CallbackQuery]):
+        if obj.chat and obj.chat.id not in known_group:
+            logger.warning(f'Chat id={obj.chat.id} name={obj.chat.title} not known!')
         if obj.from_user:
             user_id = obj.from_user.id
             if user_id in bl_users:

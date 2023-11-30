@@ -16,7 +16,8 @@ url_regex = r'https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[
             r'https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9]+\.[^\s]{2,}|' \
             r'www\.[a-zA-Z0-9]+\.[^\s]{2,}'
 
-cmd_re = r'^/\w+(@\w+)?\s'
+cmd_re = r'^/\w+(@\w+)?[\s\n]'
+start_user_re = r'^@[\w_]+:?\s?'
 
 gpt_inst = ("You are ChatGPT. "
             "You're in a group chat. "

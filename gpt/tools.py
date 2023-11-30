@@ -8,6 +8,10 @@ from cmn.info import self_id, max_dialog
 from pyrogram.parser.parser import Parser
 
 
+cmd_pattern = re.compile(cmd_re)
+username_re = re.compile(start_user_re)
+
+
 def trim_command(text: str) -> str:
     """
     before: /command@botname text
@@ -15,7 +19,6 @@ def trim_command(text: str) -> str:
     after: text
     """
     if ' ' in text:
-        cmd_pattern = re.compile(cmd_re)
         cmd = cmd_pattern.match(text)
         while cmd:
             text = text[cmd.end():]
@@ -33,7 +36,6 @@ def trim_starting_username(text: str) -> str:
     before: @botname text
     after: text
     """
-    username_re = re.compile(r'^@[\w_]+:?\s?')
     username = username_re.match(text)
     if username:
         logger.info(f'[func_chat]\tbefore: {text} after: {text[username.end():]}')
