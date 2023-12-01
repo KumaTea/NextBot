@@ -8,7 +8,6 @@ def gen_uuid(length: int = 4) -> str:
     return str(uuid.uuid4())[:length]
 
 
-
 def ocr_handler(img_bytes: bytes, lang: str = 'ch'):
     result = ''
     status = 200

@@ -93,6 +93,9 @@ def gpt_to_bot(text: str) -> str:
 
 def gen_thread(dialogue: list[Message], custom_inst: str = None) -> list[dict]:
     multiuser = False
+    for m in dialogue.copy():
+        if not m.from_user:
+            dialogue.remove(m)
 
     user_ids = list(set([m.from_user.id for m in dialogue] + [self_id]))
     if len(user_ids) > 2:

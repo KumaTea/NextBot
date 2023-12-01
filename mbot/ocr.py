@@ -9,6 +9,7 @@ from pyrogram.enums.parse_mode import ParseMode
 
 
 API = 'https://cap.kmtea.eu/ocr'
+BAK_API = 'http://172.21.45.250/ocr'
 
 
 async def process_ocr(bot: Client, chat_id: int, reply_id: int, inform_id: int, lang: str = 'ch') -> Message:
@@ -30,17 +31,23 @@ async def process_ocr(bot: Client, chat_id: int, reply_id: int, inform_id: int, 
         return await inform.edit_text(f'Error: `{e}`', parse_mode=ParseMode.MARKDOWN)
 
     to_return = None
+    result = None
     try:
         with open(filename, 'rb') as f:
             files = {'image': f}
             values = {'lang': lang}
             r = requests.post(API, files=files, data=values)
+            if r.status_code != 200:
+                r = requests.post(BAK_API, files=files, data=values)
+            if r.status_code != 200:
+                raise ConnectionError(f'HTTP {r.status_code}, tried API and BAK_API')
+
             result = r.json()['result']
             text = f'```\n{result}\n```'
             to_return = await inform.edit_text(text, parse_mode=ParseMode.MARKDOWN)
     except Exception as e:
         if 'MESSAGE_NOT_MODIFIED' not in str(e):
-            to_return = await inform.edit_text(f'Error: `{e}`', parse_mode=ParseMode.MARKDOWN)
+            to_return = await inform.edit_text(f'Error: `{e}` Result: `{result}`', parse_mode=ParseMode.MARKDOWN)
     finally:
         os.remove(filename)
 
