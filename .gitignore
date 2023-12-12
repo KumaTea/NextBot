@@ -4,7 +4,6 @@ token*
 __pycache__
 data
 .ipynb_checkpoints
-local*
 *.ini
 life
 tmp

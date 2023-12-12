@@ -2,7 +2,7 @@ import uuid
 from pyrogram import Client
 from cmn.info import max_dialog
 from pyrogram.types import Message
-from bot.session import bot, msg_store, logger
+from bot.session import bot, msg_store, logging
 
 
 async def get_message(chat_id: int, msg_id: int, client: Client = bot) -> Message:
@@ -10,9 +10,9 @@ async def get_message(chat_id: int, msg_id: int, client: Client = bot) -> Messag
     if not msg:
         msg = await client.get_messages(chat_id, msg_id)
         msg_store.add(msg)
-        logger.info(f'[tg_tools]\t\tGet message {msg_id} via API')
+        logging.info(f'[tg_tools]\t\tGet message {msg_id} via API')
     else:
-        logger.info(f'[tg_tools]\t\tGet message {msg_id} via cache')
+        logging.info(f'[tg_tools]\t\tGet message {msg_id} via cache')
     return msg
 
 

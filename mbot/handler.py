@@ -2,7 +2,7 @@ import os
 import time
 from pathlib import Path
 from pyrogram import Client
-from bot.session import logger
+from bot.session import logging
 from mbot.ocr import process_ocr
 from mbot.voice import process_voice
 from cmn.data import TEMP_DIR, REBOOT_CMD
@@ -29,14 +29,14 @@ class StatHolder:
 
     def __enter__(self):
         while os.path.isfile(self.sign):
-            logger.info(f'Media bot pid={self.pid} waiting...')
+            logging.info(f'Media bot pid={self.pid} waiting...')
             time.sleep(self.delay)
         Path(self.sign).touch()
-        logger.info(f'Media bot pid={self.pid} started!')
+        logging.info(f'Media bot pid={self.pid} started!')
 
     def __exit__(self, exc_type, exc_val, exc_tb):
         os.remove(self.sign)
-        logger.info(f'Media bot pid={self.pid} stopped.')
+        logging.info(f'Media bot pid={self.pid} stopped.')
 
 
 async def handler(bot: Client):
@@ -51,8 +51,8 @@ async def handler(bot: Client):
                         await process_task(bot, task)
                     except RuntimeError as e:
                         if 'Event loop is closed' in str(e):
-                            logger.error('Event loop is closed')
-                            logger.error('Rebooting...')
+                            logging.error('Event loop is closed')
+                            logging.error('Rebooting...')
                             return os.system(REBOOT_CMD)
     except Exception as e:
-        logger.error(e)
+        logging.error(e)

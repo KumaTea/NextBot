@@ -6,7 +6,7 @@ if os.name == 'posix':
 
 from bot.starting import starting
 from bot.stopping import stopping
-from bot.session import bot, logger
+from bot.session import bot, logging
 
 
 starting()
@@ -16,7 +16,7 @@ if __name__ == '__main__':
     try:
         bot.run()
     except Exception as e:
-        logger.warning('[main]\tException')
-        logger.warning(f'{e=}')
+        logging.warning('[main]\tException')
+        logging.warning(f'{e=}')
     finally:
         stopping()

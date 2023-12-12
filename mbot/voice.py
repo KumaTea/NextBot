@@ -3,7 +3,7 @@ from cmn.data import *
 from pyrogram import Client
 from bot.tools import gen_uuid
 from pyrogram.types import Message
-from bot.session import gpt, logger
+from bot.session import gpt, logging
 from pyrogram.enums.parse_mode import ParseMode
 
 
@@ -27,7 +27,7 @@ async def transcribe_voice(voice_path: str) -> str:
             language='zh'
         )
     text = transcript.text
-    logger.info(f'[func_voice]\t{text}')
+    logging.info(f'[func_voice]\t{text}')
 
     if not text.strip():
         return '啥也没说'
@@ -66,8 +66,8 @@ async def process_voice(bot: Client, chat_id: int, voice_id: int, inform_id: int
         # msg_store.add(message)
         inform = await inform.edit_text(text, parse_mode=ParseMode.MARKDOWN)
     except Exception as e:
-        logger.warning(f'[func_voice]\tERROR!!!')
-        logger.warning(f'[func_voice]\t{e}')
+        logging.warning(f'[func_voice]\tERROR!!!')
+        logging.warning(f'[func_voice]\t{e}')
         inform = await inform.edit_text('听不懂捏')
     finally:
         if voice_path and os.path.isfile(voice_path):

@@ -1,7 +1,7 @@
 import re
 from cmn.data import *
 from gpt.glossary import *
-from bot.session import logger
+from bot.session import logging
 from pprint import PrettyPrinter
 from pyrogram.types import Message
 from cmn.info import self_id, max_dialog
@@ -38,7 +38,7 @@ def trim_starting_username(text: str) -> str:
     """
     username = username_re.match(text)
     if username:
-        logger.info(f'[func_chat]\tbefore: {text} after: {text[username.end():]}')
+        logging.info(f'[func_chat]\tbefore: {text} after: {text[username.end():]}')
         text = text[username.end():]
     return text
 
@@ -139,7 +139,7 @@ def gen_thread(dialogue: list[Message], custom_inst: str = None) -> list[dict]:
             else:
                 dialog_thread.append({'role': role, 'content': f'{bot_to_gpt(text)}'})
     for m in dialog_thread:
-        logger.info(f'[func_chat]\t' + m['role'] + ': ' + m['content'])
+        logging.info(f'[func_chat]\t' + m['role'] + ': ' + m['content'])
     dialog_thread = dialog_thread[-max_dialog:]
     thread.extend(dialog_thread)
     PrettyPrinter().pprint(thread)

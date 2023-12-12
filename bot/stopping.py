@@ -1,6 +1,6 @@
-from bot.session import msg_store, logger
+from bot.session import msg_store, logging
 
 
 def stopping():
     msg_store.save()
-    logger.info('Stopping bot')
+    logging.info('Stopping bot')

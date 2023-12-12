@@ -1,6 +1,6 @@
 import os
 
-version = '2.3.1.208'
+version = '2.3.2.215'
 channel = 'local' if os.name == 'nt' else 'cloud'
 username = 'rbskbot'
 
