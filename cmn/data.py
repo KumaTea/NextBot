@@ -101,6 +101,7 @@ bot_commands = {
     'smart': ['smart', 's'],
     'debate': ['debate', 'd', 'g'],
     'ocr': ['ocr'],
+    'cap': ['cap'],
 }
 
 thinking_emojis = list(
