@@ -14,7 +14,7 @@ app = Flask(__name__)
 
 
 @app.route('/ocr', methods=['POST'])
-def respond():
+def ocr():
     if request.method == 'POST':
         logger.info('[OCR]\treceived request...')
         if request.files:
@@ -29,7 +29,7 @@ def respond():
 
 
 @app.route('/cap', methods=['POST'])
-def respond():
+def cap():
     if request.method == 'POST':
         logger.info('[CAP]\treceived request...')
         if request.files:

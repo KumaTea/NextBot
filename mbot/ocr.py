@@ -36,9 +36,9 @@ async def process_ocr(bot: Client, chat_id: int, reply_id: int, inform_id: int, 
         with open(filename, 'rb') as f:
             files = {'image': f}
             values = {'lang': lang}
-            r = requests.post(API, files=files, data=values)
+            r = requests.post(API, files=files, data=values, timeout=120)
             if r.status_code != 200:
-                r = requests.post(BAK_API, files=files, data=values)
+                r = requests.post(BAK_API, files=files, data=values, timeout=120)
             if r.status_code != 200:
                 raise ConnectionError(f'HTTP {r.status_code}, tried API and BAK_API')
 
