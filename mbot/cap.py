@@ -8,11 +8,11 @@ from pyrogram.types import Message
 from pyrogram.enums.parse_mode import ParseMode
 
 
-API = 'https://cap.kmtea.eu/ocr'
-BAK_API = 'http://172.21.45.250/ocr'
+API = 'https://cap.kmtea.eu/cap'
+BAK_API = 'http://172.21.45.250/cap'
 
 
-async def process_ocr(bot: Client, chat_id: int, reply_id: int, inform_id: int, lang: str = 'ch') -> Message:
+async def process_cap(bot: Client, chat_id: int, reply_id: int, inform_id: int, model: str = 'blip') -> Message:
     reply, inform = await asyncio.gather(
         bot.get_messages(chat_id, reply_id),
         bot.get_messages(chat_id, inform_id)
@@ -21,7 +21,7 @@ async def process_ocr(bot: Client, chat_id: int, reply_id: int, inform_id: int, 
     while any(f in ' '.join(os.listdir(TEMP_DIR)) for f in ['ocr', 'cap']):
         await asyncio.sleep(1)
 
-    filename = f'/dev/shm/ocr-{gen_uuid()}.png'
+    filename = f'/dev/shm/cap-{gen_uuid()}.png'
     try:
         await reply.download(filename)
     except ValueError as e:
@@ -35,7 +35,7 @@ async def process_ocr(bot: Client, chat_id: int, reply_id: int, inform_id: int, 
     try:
         with open(filename, 'rb') as f:
             files = {'image': f}
-            values = {'lang': lang}
+            values = {'model': model}
             r = requests.post(API, files=files, data=values)
             if r.status_code != 200:
                 r = requests.post(BAK_API, files=files, data=values)

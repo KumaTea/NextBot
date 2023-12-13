@@ -13,6 +13,7 @@ def register_handlers():
     bot.add_handler(MessageHandler(command_smart, filters.command(bot_commands['smart']) & filters.group))
     bot.add_handler(MessageHandler(command_debate, filters.command(bot_commands['debate']) & filters.group))
     bot.add_handler(MessageHandler(command_ocr, filters.command(bot_commands['ocr']) & filters.group))
+    bot.add_handler(MessageHandler(command_cap, filters.command(bot_commands['cap']) & filters.group))
 
     # group messages
     bot.add_handler(MessageHandler(process_msg, filters.group))

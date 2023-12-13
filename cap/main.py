@@ -1,6 +1,6 @@
 import logging
-from handler import ocr_handler
 from flask import Flask, request, jsonify
+from handler import ocr_handler, cap_handler
 
 
 logging.basicConfig(
@@ -23,6 +23,21 @@ def respond():
             logger.info(f'[OCR]\tprocessing...')
             result, status = ocr_handler(image, lang)
             logger.info('[OCR]\tresponding...')
+            return jsonify({'result': result}), status
+        else:
+            return jsonify({'error': 'No image received.'}), 404
+
+
+@app.route('/cap', methods=['POST'])
+def respond():
+    if request.method == 'POST':
+        logger.info('[CAP]\treceived request...')
+        if request.files:
+            image = request.files['image'].read()
+            model = request.form.get('model', 'blip')
+            logger.info(f'[CAP]\tprocessing...')
+            result, status = cap_handler(image, model)
+            logger.info('[CAP]\tresponding...')
             return jsonify({'result': result}), status
         else:
             return jsonify({'error': 'No image received.'}), 404

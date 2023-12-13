@@ -4,6 +4,7 @@ from pathlib import Path
 from pyrogram import Client
 from bot.session import logging
 from mbot.ocr import process_ocr
+from mbot.cap import process_cap
 from mbot.voice import process_voice
 from cmn.data import TEMP_DIR, REBOOT_CMD
 
@@ -16,6 +17,9 @@ async def process_task(bot: Client, task: str):
     if task.startswith('ocr'):
         task_name, chat_id, reply_id, inform_id, lang = task.split(',')
         return await process_ocr(bot, int(chat_id), int(reply_id), int(inform_id), lang)
+    elif task.startswith('cap'):
+        task_name, chat_id, reply_id, inform_id, model = task.split(',')
+        return await process_cap(bot, int(chat_id), int(reply_id), int(inform_id), model)
     elif task.startswith('voice'):
         task_name, chat_id, reply_id, inform_id = task.split(',')
         return await process_voice(bot, int(chat_id), int(reply_id), int(inform_id))
