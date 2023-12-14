@@ -1,13 +1,6 @@
-import logging
+from session import logging
 from flask import Flask, request, jsonify
 from handler import ocr_handler, cap_handler
-
-
-logging.basicConfig(
-    format='%(asctime)s %(levelname)-8s %(message)s',
-    level=logging.INFO,
-    datefmt='%Y-%m-%d %H:%M:%S')
-logger = logging.getLogger(__name__)
 
 
 app = Flask(__name__)
@@ -16,13 +9,13 @@ app = Flask(__name__)
 @app.route('/ocr', methods=['POST'])
 def ocr():
     if request.method == 'POST':
-        logger.info('[OCR]\treceived request...')
+        logging.info('[OCR]\treceived request...')
         if request.files:
             image = request.files['image'].read()
             lang = request.form.get('lang', 'ch')
-            logger.info(f'[OCR]\tprocessing...')
+            logging.info(f'[OCR]\tprocessing...')
             result, status = ocr_handler(image, lang)
-            logger.info('[OCR]\tresponding...')
+            logging.info('[OCR]\tresponding...')
             return jsonify({'result': result}), status
         else:
             return jsonify({'error': 'No image received.'}), 404
@@ -31,13 +24,13 @@ def ocr():
 @app.route('/cap', methods=['POST'])
 def cap():
     if request.method == 'POST':
-        logger.info('[CAP]\treceived request...')
+        logging.info('[CAP]\treceived request...')
         if request.files:
             image = request.files['image'].read()
             model = request.form.get('model', 'blip')
-            logger.info(f'[CAP]\tprocessing...')
+            logging.info(f'[CAP]\tprocessing...')
             result, status = cap_handler(image, model)
-            logger.info('[CAP]\tresponding...')
+            logging.info('[CAP]\tresponding...')
             return jsonify({'result': result}), status
         else:
             return jsonify({'error': 'No image received.'}), 404

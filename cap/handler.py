@@ -1,6 +1,7 @@
 import os
 import uuid
 import subprocess
+from session import popen_reader
 
 
 def gen_uuid(length: int = 4) -> str:
@@ -20,7 +21,8 @@ def ocr_handler(img_bytes: bytes, lang: str = 'ch'):
 
     try:
         command = f'python3 ocr.py -i {filename} -l {lang} -o {output}'
-        subprocess.run(command.split(), stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        p = subprocess.Popen(command.split(), stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        result, error = popen_reader(p)
         with open(output, 'r') as f:
             result = f.read()
     except FileNotFoundError:
@@ -50,7 +52,8 @@ def cap_handler(img_bytes: bytes, model: str = 'blip'):
 
     try:
         command = f'python3 cap.py -i {filename} -o {output} -m {model}'
-        subprocess.run(command.split(), stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        p = subprocess.Popen(command.split(), stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        result, error = popen_reader(p)
         with open(output, 'r') as f:
             result = f.read()
     except FileNotFoundError:
