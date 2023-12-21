@@ -1,9 +1,9 @@
 import os
 import random
 import asyncio
-from cmn.info import max_voice
+from common.info import max_voice
 from pyrogram.types import Message
-from cmn.data import TEMP_DIR, MEDIA_BOT_CMD, thinking_emojis
+from common.data import TEMP_DIR, MEDIA_BOT_CMD, thinking_emojis
 
 
 TASK_FILE = f'{TEMP_DIR}/task.txt'

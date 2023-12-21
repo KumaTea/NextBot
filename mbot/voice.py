@@ -1,5 +1,5 @@
 import asyncio
-from cmn.data import *
+from common.data import *
 from pyrogram import Client
 from bot.tools import gen_uuid
 from pyrogram.types import Message

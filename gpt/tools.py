@@ -1,10 +1,10 @@
 import re
-from cmn.data import *
+from common.data import *
 from gpt.glossary import *
 from bot.session import logging
 from pprint import PrettyPrinter
 from pyrogram.types import Message
-from cmn.info import self_id, max_dialog
+from common.info import self_id, max_dialog
 from pyrogram.parser.parser import Parser
 
 

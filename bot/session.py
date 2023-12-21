@@ -1,9 +1,9 @@
 import logging
 import configparser
-from gpt.auth import gpt_auth  # noqa
 from bot.store import MsgStore
 from pyrogram import Client as tgClient
 from openai import AsyncClient as aiClient
+from bardapi import BardCookies
 
 
 logging.basicConfig(
@@ -28,3 +28,11 @@ gpt = aiClient(
 
 gpt_model = config['openai']['model']
 msg_store = MsgStore()
+
+bard_cookies = BardCookies(
+    cookie_dict={
+        "__Secure-1PSID": config['google']['psid'],
+        "__Secure-1PSIDTS": config['google']['psidts'],
+        "__Secure-1PSIDCC": config['google']['psidcc'],
+    }
+)

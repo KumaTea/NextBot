@@ -1,5 +1,5 @@
 import os
-from cmn.data import pwd
+from common.data import pwd
 
 
 def sort_imports():

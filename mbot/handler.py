@@ -6,7 +6,7 @@ from bot.session import logging
 from mbot.ocr import process_ocr
 from mbot.cap import process_cap
 from mbot.voice import process_voice
-from cmn.data import TEMP_DIR, REBOOT_CMD
+from common.data import TEMP_DIR, REBOOT_CMD
 
 
 TASK_FILE = f'{TEMP_DIR}/task.txt'

@@ -5,13 +5,15 @@ from pyrogram import Client
 from bot.tools import get_dialog
 from bot.auth import ensure_not_bl
 from gpt.auth import ensure_gpt_auth
-from typing import Union, AsyncGenerator
-from bot.session import gpt_auth, msg_store
+from typing import Optional, AsyncGenerator
+from gpt.auth import gpt_auth
+from bot.session import msg_store
 from gpt.core import stream_chat_by_sentences
 from pyrogram.enums.parse_mode import ParseMode
-from cmn.data import smart_inst, thinking_emojis
+from common.data import smart_inst, thinking_emojis
 from pyrogram.types import Message, CallbackQuery
-from cmn.info import gpt_admins, max_chunk, min_edit_interval
+from pyrogram.enums.chat_action import ChatAction
+from common.info import gpt_admins, max_chunk, min_edit_interval
 from gpt.tools import gen_thread, gpt_to_bot, trim_starting_username
 
 
@@ -66,20 +68,12 @@ async def gpt_callback_handler(client, callback_query):
         return await callback_gpt_auth(client, callback_query)
 
 
-@ensure_not_bl
-@ensure_gpt_auth
-async def command_chat(client: Client, message: Message) -> Union[Message, None]:
-    command = message.text
-    content_index = command.find(' ')
-    reply = message.reply_to_message
-    if content_index == -1:
-        # no text
-        if not reply:
-            return await message.reply_text('/chat 不支持无输入调用。')
+async def reply_handler(client: Client, message: Message) -> Message:
+    resp_message = await message.reply_text(random.choice(thinking_emojis) + '❓')
 
-    dialog, resp_message = await asyncio.gather(
+    dialog, _ = await asyncio.gather(
         get_dialog(client, message),
-        message.reply_text(random.choice(thinking_emojis) + '❓')
+        message.reply_chat_action(ChatAction.TYPING)
     )
 
     thread = gen_thread(dialog)
@@ -88,7 +82,22 @@ async def command_chat(client: Client, message: Message) -> Union[Message, None]
 
 @ensure_not_bl
 @ensure_gpt_auth
-async def command_smart(client: Client, message: Message) -> Union[Message, None]:
+async def command_chat(client: Client, message: Message) -> Optional[Message]:
+    command = message.text
+    command_handle = command.split(' ')[0].split('@')[0].lower()
+    content_index = command.find(' ')
+    reply = message.reply_to_message
+    if content_index == -1:
+        # no text
+        if not reply:
+            return await message.reply_text(f'{command_handle} 不支持无输入调用。')
+
+    return await reply_handler(client, message)
+
+
+@ensure_not_bl
+@ensure_gpt_auth
+async def command_smart(client: Client, message: Message) -> Optional[Message]:
     command = message.text
     content_index = command.find(' ')
     if content_index == -1:
@@ -97,21 +106,8 @@ async def command_smart(client: Client, message: Message) -> Union[Message, None
 
     resp_message = await message.reply_text(random.choice(thinking_emojis) + '❓')
     thread = gen_thread([message], custom_inst=smart_inst)
-    return await type_in_message(resp_message, stream_chat_by_sentences(thread))
-
-
-@ensure_not_bl
-@ensure_gpt_auth
-async def command_debate(client: Client, message: Message) -> Union[Message, None]:
-    command = message.text
-    content_index = command.find(' ')
-    if content_index == -1:
-        # no text
-        return await message.reply_text('/debate 不支持无输入调用。')
-
-    dialog, resp_message = await asyncio.gather(
-        get_dialog(client, message),
-        message.reply_text(random.choice(thinking_emojis) + '❓')
+    result, _ = await asyncio.gather(
+        type_in_message(resp_message, stream_chat_by_sentences(thread)),
+        message.reply_chat_action(ChatAction.TYPING)
     )
-    thread = gen_thread(dialog)
-    return await type_in_message(resp_message, stream_chat_by_sentences(thread))
+    return result

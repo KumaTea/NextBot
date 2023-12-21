@@ -1,4 +1,4 @@
-from cmn.data import *
+from common.data import *
 from bot.session import bot
 from pyrogram import filters
 from handlers.functions import *
@@ -11,7 +11,7 @@ def register_handlers():
     # group commands
     bot.add_handler(MessageHandler(command_chat, filters.command(bot_commands['chat']) & filters.group))
     bot.add_handler(MessageHandler(command_smart, filters.command(bot_commands['smart']) & filters.group))
-    bot.add_handler(MessageHandler(command_debate, filters.command(bot_commands['debate']) & filters.group))
+    bot.add_handler(MessageHandler(command_chat, filters.command(bot_commands['debate']) & filters.group))
     bot.add_handler(MessageHandler(command_ocr, filters.command(bot_commands['ocr']) & filters.group))
     bot.add_handler(MessageHandler(command_cap, filters.command(bot_commands['cap']) & filters.group))
 

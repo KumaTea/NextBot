@@ -1,10 +1,10 @@
 import os
-from typing import Union
+from typing import Optional
 from pyrogram import Client
-from cmn.info import gpt_admins
+from common.info import gpt_admins
 from pyrogram.types import Message
 from pyrogram.enums.parse_mode import ParseMode
-from cmn.data import gpt_users_file, gpt_auth_info, bot_debug_info
+from common.data import gpt_users_file, gpt_auth_info, bot_debug_info
 from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 
 
@@ -44,7 +44,7 @@ def has_gpt_auth(client: Client, message: Message) -> bool:
     return False
 
 
-async def ask_for_gpt_auth(client: Client, message: Message) -> Union[Message, None]:
+async def ask_for_gpt_auth(client: Client, message: Message) -> Optional[Message]:
     if os.name == 'nt':
         # debugging
         return await message.reply_text(bot_debug_info, parse_mode=ParseMode.MARKDOWN, disable_web_page_preview=True)

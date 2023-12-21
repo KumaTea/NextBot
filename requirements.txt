@@ -1,7 +1,28 @@
-openai>=1.0.0
+# common
+# conda
 requests
 pyrogram
 uvloop; sys_platform != 'win32'
+
+# openai
+# conda
+openai>=1.0.0
+
+# google
+# conda
+# httpx
+# requests
+# colorama
+beautifulsoup4
+pycryptodomex
+google-cloud-translate
+langdetect
+lz4
+
+# pip
+# browser-cookie3
+# deep-translator
+bardapi
 
 # conda
 # nomkl

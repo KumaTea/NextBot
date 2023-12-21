@@ -1,15 +1,15 @@
-from typing import Union
+from typing import Optional
 from pyrogram import Client
 from pyrogram.types import Message
 from bot.auth import ensure_not_bl
 from func.voice import process_voice
-from cmn.info import self_id, username
-from cmn.data import voice_tag, gpt_auth_info
+from common.info import self_id, username
+from common.data import voice_tag, gpt_auth_info
 from func.chat import command_chat, ensure_gpt_auth
 
 
 @ensure_gpt_auth
-async def replied_chat(client: Client, message: Message) -> Union[Message, None]:
+async def replied_chat(client: Client, message: Message) -> Optional[Message]:
     message.text = f'/chat {message.text}'
 
     if message.entities:
@@ -20,7 +20,7 @@ async def replied_chat(client: Client, message: Message) -> Union[Message, None]
 
 
 @ensure_not_bl
-async def process_msg(client: Client, message: Message) -> Union[Message, None]:
+async def process_msg(client: Client, message: Message) -> Optional[Message]:
     if message.from_user:
         user_id = message.from_user.id
         if user_id == self_id:

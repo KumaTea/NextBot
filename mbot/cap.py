@@ -2,7 +2,7 @@ import os
 import asyncio
 import requests
 from pyrogram import Client
-from cmn.data import TEMP_DIR
+from common.data import TEMP_DIR
 from bot.tools import gen_uuid
 from pyrogram.types import Message
 from pyrogram.enums.parse_mode import ParseMode

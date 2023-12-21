@@ -3,7 +3,7 @@ import asyncio
 from pyrogram import Client
 from bot.auth import ensure_not_bl
 from pyrogram.types import Message
-from cmn.data import TEMP_DIR, MEDIA_BOT_CMD
+from common.data import TEMP_DIR, MEDIA_BOT_CMD
 from pyrogram.enums.parse_mode import ParseMode
 
 
