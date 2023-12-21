@@ -4,8 +4,8 @@ from gpt.glossary import *
 from bot.session import logging
 from pprint import PrettyPrinter
 from pyrogram.types import Message
-from common.info import self_id, max_dialog
 from pyrogram.parser.parser import Parser
+from common.info import self_id, max_dialog
 
 
 cmd_pattern = re.compile(cmd_re)

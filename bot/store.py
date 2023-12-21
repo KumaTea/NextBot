@@ -1,8 +1,8 @@
 import os
 import pickle
 import logging  # bot.session imported bot.store
-from common.data import msg_data_dir
 from pyrogram.types import Message
+from common.data import msg_data_dir
 
 
 class MsgStore:
