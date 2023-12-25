@@ -52,5 +52,9 @@ async def process_msg(client: Client, message: Message) -> Optional[Message]:
             return None
 
     if message.voice:
-        return await process_voice(message)
+        if (
+            not message.forward_date  # not forwarded
+            or message.forward_from  # forwarded, but can be checked
+        ):
+            return await process_voice(message)
     return None
