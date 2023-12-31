@@ -10,19 +10,14 @@ openai>=1.0.0
 
 # google
 # conda
-# httpx
-# requests
+# google-auth
+# google-api-core
 # colorama
-beautifulsoup4
-pycryptodomex
-google-cloud-translate
-langdetect
-lz4
+# grpcio-status
+# proto-plus
 
 # pip
-# browser-cookie3
-# deep-translator
-bardapi
+# google-generativeai
 
 # conda
 # nomkl
