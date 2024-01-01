@@ -18,57 +18,48 @@ async def google_search_raw(query: str) -> str:
             return await resp.text()
 
 
-def first_google_result_div(html: str) -> Tag:
-    soup = BeautifulSoup(html, 'html.parser')
-    main = soup.find('div', id='main')
-    search = main.find('div', id='search')
-    rso = search.find('div', id='rso')
-    first_div = rso.find('div')
-    return first_div
-
-
-def first_google_result(first_div: Tag) -> str:
-    return tag_to_text(first_div)
-
-
 def get_google_results(html: str, num: int = 3) -> list[Tag]:
     soup = BeautifulSoup(html, 'html.parser')
     main = soup.find('div', id='main')
     search = main.find('div', id='search')
     rso = search.find('div', id='rso')
-    divs = rso.find_all('div', recursive=False)
+    divs = []
+    data_div = rso.find('g-card-section')
+    if data_div:
+        divs.append(data_div)
+    overview = rso.find('div', attrs={'id': 'kp-wp-tab-overview'})
+    if overview:
+        divs.extend(overview.find_all('div', recursive=False))
+    else:
+        divs.extend(rso.find_all('div', recursive=False))
     return divs[:num]
 
 
-def google_organic_result(first_div: Tag) -> str:
+def has_google_organic_result(first_div: Tag) -> bool:
     has_feedback_button = False
     for span in first_div.find_all('span'):
         if FEEDBACK_SPAN_CLASS in span.attrs.get('class', []):
             has_feedback_button = True
             break
-    if has_feedback_button:
-        return first_google_result(first_div)
-    return ''
+    return has_feedback_button
 
 
 def google_knowledge_card(html: str) -> str:
     soup = BeautifulSoup(html, 'html.parser')
     main = soup.find('div', id='main')
-    knowledge_card = main.find('div', class_='kp-wholepage')
-    if not knowledge_card:
-        return ''
-    result = tag_to_text(knowledge_card)
-    return result
+    complementary = main.find('div', id='rhs')
+    if complementary:
+        return tag_to_text(complementary)
+    return ''
 
 
 def get_google_final_result(html: str, num: int = 3) -> str:
-    first_div = first_google_result_div(html)
-    organic_result = google_organic_result(first_div)
-    knowledge_card = google_knowledge_card(html)
     google_results = get_google_results(html, num)
+    has_organic_result = has_google_organic_result(google_results[0])
+    knowledge_card = google_knowledge_card(html)
     results_text = [tag_to_text(div) for div in google_results]
     if knowledge_card:
-        if organic_result:
+        if has_organic_result:
             results_text.insert(1, knowledge_card)
         else:
             results_text.insert(0, knowledge_card)
