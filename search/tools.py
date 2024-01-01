@@ -1,3 +1,4 @@
+import unicodedata
 from bs4 import Tag
 
 
@@ -11,5 +12,6 @@ def trim_result_text(result: str) -> str:
 
 def tag_to_text(tag: Tag) -> str:
     result = tag.get_text()
+    result = unicodedata.normalize('NFKC', result)
     result = trim_result_text(result)
     return result

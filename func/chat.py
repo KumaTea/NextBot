@@ -15,7 +15,7 @@ from pyrogram.types import Message, CallbackQuery
 from pyrogram.enums.chat_action import ChatAction
 from common.data import smart_inst, thinking_emojis
 from common.info import gpt_admins, max_chunk, min_edit_interval
-from gpt.tools import gen_thread, gpt_to_bot, trim_starting_username
+from gpt.tools import gen_thread, gpt_to_bot, trim_starting_username, process_message
 
 
 async def type_in_message(message: Message, generator: AsyncGenerator[str, None]) -> Message:
@@ -72,7 +72,8 @@ async def gpt_callback_handler(client, callback_query):
 async def get_search_result(message: Message, is_reply: bool = False) -> str:
     if is_reply:
         return ''
-    return await search(message.text)
+    query = process_message(message)
+    return await search(query)
 
 
 async def reply_handler(client: Client, message: Message, is_reply: bool = False) -> Message:
