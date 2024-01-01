@@ -28,6 +28,6 @@ def ensure_not_bl(func):
             user_id = msg.forward_from.id
             if user_id in bl_users:
                 logging.warning(f'Forwarded user {user_id} is in blacklist! Ignoring message.')
-            return None
+                return None
         return await func(client, obj)
     return wrapper
