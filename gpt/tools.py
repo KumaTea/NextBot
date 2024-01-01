@@ -91,6 +91,14 @@ def gpt_to_bot(text: str) -> str:
     return text
 
 
+def get_cmd_type(text: str) -> str:
+    for cmd_type in bot_commands:  # 'chat', 'smart', 'debate'
+        for cmd in bot_commands[cmd_type]:  # 'chat', 'c', etc.
+            if text.startswith(f'/{cmd}'):
+                return cmd_type
+    return 'chat'
+
+
 def gen_thread(dialogue: list[Message], custom_inst: str = None, search_result: str = None) -> list[dict]:
     # detect multiuser
     multiuser = False
@@ -105,15 +113,12 @@ def gen_thread(dialogue: list[Message], custom_inst: str = None, search_result: 
     inst = {}
     if custom_inst:
         inst = {'role': 'system', 'content': custom_inst}
+    elif search_result:
+        inst = {'role': 'system', 'content': f'{gpt_inst} {web_inst}'}
     else:
         first_msg_text = dialogue[0].text
         if first_msg_text:
-            command = ''
-            for cmd_type in bot_commands:  # 'chat', 'smart', 'debate'
-                for cmd in bot_commands[cmd_type]:  # 'chat', 'c', etc.
-                    if first_msg_text.startswith(f'/{cmd}'):
-                        command = cmd_type
-                        break
+            command = get_cmd_type(first_msg_text)
             if command == 'smart':
                 inst = {'role': 'system', 'content': smart_inst}
             elif command == 'debate':

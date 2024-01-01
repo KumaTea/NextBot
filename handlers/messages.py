@@ -12,7 +12,7 @@ from func.chat import chat_core, ensure_gpt_auth
 @ensure_gpt_auth
 async def replied_chat(client: Client, message: Message) -> Optional[Message]:
     msg_store.add(message)
-    return await chat_core(client, message, True)
+    return await chat_core(client, message, False)
 
 
 @ensure_not_bl

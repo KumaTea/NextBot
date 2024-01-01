@@ -15,7 +15,7 @@ from pyrogram.types import Message, CallbackQuery
 from pyrogram.enums.chat_action import ChatAction
 from common.data import smart_inst, thinking_emojis
 from common.info import gpt_admins, max_chunk, min_edit_interval
-from gpt.tools import gen_thread, gpt_to_bot, trim_starting_username, process_message
+from gpt.tools import gen_thread, gpt_to_bot, trim_starting_username, process_message, get_cmd_type
 
 
 async def type_in_message(message: Message, generator: AsyncGenerator[str, None]) -> Message:
@@ -69,19 +69,21 @@ async def gpt_callback_handler(client, callback_query):
         return await callback_gpt_auth(client, callback_query)
 
 
-async def get_search_result(message: Message, is_reply: bool = False) -> str:
-    if is_reply:
-        return ''
-    query = process_message(message)
-    return await search(query)
+async def get_search_result(message: Message, need_search: bool = False) -> str:
+    if need_search:
+        query = process_message(message)
+        return await search(query)
+    return ''
 
 
-async def reply_handler(client: Client, message: Message, is_reply: bool = False) -> Message:
+async def reply_handler(client: Client, message: Message, need_search: bool = False) -> Message:
     resp_message = await message.reply_text(random.choice(thinking_emojis) + '❓')
 
+    if get_cmd_type(message.text) != 'chat':
+        need_search = False
     dialog, search_result, _ = await asyncio.gather(
         get_dialog(client, message),
-        get_search_result(message, is_reply),
+        get_search_result(message, need_search),
         message.reply_chat_action(ChatAction.TYPING)
     )
 
@@ -89,8 +91,8 @@ async def reply_handler(client: Client, message: Message, is_reply: bool = False
     return await type_in_message(resp_message, stream_chat_by_sentences(thread))
 
 
-async def chat_core(client: Client, message: Message, is_reply: bool = False) -> Optional[Message]:
-    return await reply_handler(client, message, is_reply)
+async def chat_core(client: Client, message: Message, need_search: bool = False) -> Optional[Message]:
+    return await reply_handler(client, message, need_search)
 
 
 @ensure_not_bl
@@ -106,7 +108,7 @@ async def command_chat(client: Client, message: Message) -> Optional[Message]:
         if not reply:
             return await message.reply_text(f'{command_handle} 不支持无输入调用。')
 
-    return await chat_core(client, message, False)
+    return await chat_core(client, message, True)
 
 
 @ensure_not_bl
