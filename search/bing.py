@@ -2,7 +2,7 @@ import aiohttp
 from bot.session import logging
 from bs4 import BeautifulSoup, Tag
 from common.data import USER_AGENT
-from search.tools import trim_result_text
+from search.tools import tag_to_text
 
 
 async def bing_search_raw(query: str) -> str:
@@ -19,41 +19,50 @@ def bing_answer(html: str) -> str:
     soup = BeautifulSoup(html, 'html.parser')
     bing_content = soup.find('div', id='b_content')
     bing_results = bing_content.find('ol', id='b_results')
-    bing_answers = bing_results.find_all('li', class_='b_ans')
+    bing_answers = bing_results.find_all('li', class_='b_ans', recursive=False)
     if not bing_answers:
         return ''
     first_answer = bing_answers[0]
-    result = first_answer.get_text()
-    result = trim_result_text(result)
+    result = tag_to_text(first_answer)
     return result
 
 
-def first_bing_result(html: str) -> str:
+def get_bing_results(html: str, num: int = 3) -> list[Tag]:
     soup = BeautifulSoup(html, 'html.parser')
     bing_content = soup.find('div', id='b_content')
     bing_results = bing_content.find('ol', id='b_results')
-    first_result = bing_results.find('li', class_='b_algo')
-    result = first_result.get_text()
-    result = trim_result_text(result)
-    return result
+    results = bing_results.find_all('li', class_='b_algo', recursive=False)
+    return results[:num]
 
 
 def bing_knowledge_card(html: str) -> str:
     soup = BeautifulSoup(html, 'html.parser')
     bing_content = soup.find('div', id='b_content')
     bing_context = bing_content.find('ol', id='b_context')
-    bing_answers = bing_context.find_all('li', class_='b_ans')
+    bing_answers = bing_context.find_all('li', class_='b_ans', recursive=False)
     if not bing_answers:
         return ''
     first_answer = bing_answers[0]
-    result = first_answer.get_text()
-    result = trim_result_text(result)
+    result = tag_to_text(first_answer)
     return result
 
 
-async def bing_search(query: str) -> str:
+def get_bing_final_result(html: str, num: int = 3) -> str:
+    answer = bing_answer(html)
+    knowledge_card = bing_knowledge_card(html)
+    bing_results = get_bing_results(html, num)
+    results_text = [tag_to_text(div) for div in bing_results]
+    if knowledge_card:
+        if answer:
+            results_text.insert(1, knowledge_card)
+        else:
+            results_text.insert(0, knowledge_card)
+    return '\n\n'.join(results_text[:num])
+
+
+async def bing_search(query: str, num: int = 3) -> str:
     html = await bing_search_raw(query)
-    result = bing_answer(html) or bing_knowledge_card(html) or first_bing_result(html)
+    result = get_bing_final_result(html, num)
     if not result:
         logging.warning(f'[bing] No results found for {query}')
     return result

@@ -2,7 +2,7 @@ import aiohttp
 from bot.session import logging
 from bs4 import BeautifulSoup, Tag
 from common.data import USER_AGENT
-from search.tools import trim_result_text
+from search.tools import tag_to_text
 
 
 FEEDBACK_SPAN_CLASS = 'W7GCoc'
@@ -28,9 +28,16 @@ def first_google_result_div(html: str) -> Tag:
 
 
 def first_google_result(first_div: Tag) -> str:
-    result = first_div.get_text()
-    result = trim_result_text(result)
-    return result
+    return tag_to_text(first_div)
+
+
+def get_google_results(html: str, num: int = 3) -> list[Tag]:
+    soup = BeautifulSoup(html, 'html.parser')
+    main = soup.find('div', id='main')
+    search = main.find('div', id='search')
+    rso = search.find('div', id='rso')
+    divs = rso.find_all('div', recursive=False)
+    return divs[:num]
 
 
 def google_organic_result(first_div: Tag) -> str:
@@ -50,15 +57,27 @@ def google_knowledge_card(html: str) -> str:
     knowledge_card = main.find('div', class_='kp-wholepage')
     if not knowledge_card:
         return ''
-    result = knowledge_card.get_text()
-    result = trim_result_text(result)
+    result = tag_to_text(knowledge_card)
     return result
 
 
-async def google_search(query: str) -> str:
-    html = await google_search_raw(query)
+def get_google_final_result(html: str, num: int = 3) -> str:
     first_div = first_google_result_div(html)
-    result = google_organic_result(first_div) or google_knowledge_card(html) or first_google_result(first_div)
+    organic_result = google_organic_result(first_div)
+    knowledge_card = google_knowledge_card(html)
+    google_results = get_google_results(html, num)
+    results_text = [tag_to_text(div) for div in google_results]
+    if knowledge_card:
+        if organic_result:
+            results_text.insert(1, knowledge_card)
+        else:
+            results_text.insert(0, knowledge_card)
+    return '\n\n'.join(results_text[:num])
+
+
+async def google_search(query: str, num: int = 3) -> str:
+    html = await google_search_raw(query)
+    result = get_google_final_result(html, num)
     if not result:
         logging.warning(f'[google] No results found for {query}')
     return result

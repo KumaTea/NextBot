@@ -1,8 +1,8 @@
 import re
+import pprint
 from common.data import *
 from gpt.glossary import *
 from bot.session import logging
-from pprint import PrettyPrinter
 from pyrogram.types import Message
 from pyrogram.parser.parser import Parser
 from common.info import self_id, max_dialog
@@ -151,5 +151,5 @@ def gen_thread(dialogue: list[Message], custom_inst: str = None, search_result: 
         search_result_text = 'Web Search Result:\n' + search_result
         thread.append({'role': 'system', 'content': search_result_text})
 
-    PrettyPrinter().pprint(thread)
+    logging.info(pprint.pformat(thread, indent=2))
     return thread
