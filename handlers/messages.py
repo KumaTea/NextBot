@@ -1,22 +1,18 @@
 from typing import Optional
 from pyrogram import Client
+from bot.session import msg_store
 from pyrogram.types import Message
 from bot.auth import ensure_not_bl
 from func.voice import process_voice
 from common.info import self_id, username
 from common.data import voice_tag, gpt_auth_info
-from func.chat import command_chat, ensure_gpt_auth
+from func.chat import chat_core, ensure_gpt_auth
 
 
 @ensure_gpt_auth
 async def replied_chat(client: Client, message: Message) -> Optional[Message]:
-    message.text = f'/chat {message.text}'
-
-    if message.entities:
-        for entity in message.entities:
-            entity.offset += 6
-
-    return await command_chat(client, message)
+    msg_store.add(message)
+    return await chat_core(client, message, True)
 
 
 @ensure_not_bl

@@ -3,6 +3,7 @@ import asyncio
 from time import time
 from pyrogram import Client
 from gpt.auth import gpt_auth
+from search.main import search
 from bot.tools import get_dialog
 from bot.session import msg_store
 from bot.auth import ensure_not_bl
@@ -68,21 +69,33 @@ async def gpt_callback_handler(client, callback_query):
         return await callback_gpt_auth(client, callback_query)
 
 
-async def reply_handler(client: Client, message: Message) -> Message:
+async def get_search_result(message: Message, is_reply: bool = False) -> str:
+    if is_reply:
+        return ''
+    return await search(message.text)
+
+
+async def reply_handler(client: Client, message: Message, is_reply: bool = False) -> Message:
     resp_message = await message.reply_text(random.choice(thinking_emojis) + '❓')
 
-    dialog, _ = await asyncio.gather(
+    dialog, search_result, _ = await asyncio.gather(
         get_dialog(client, message),
+        get_search_result(message, is_reply),
         message.reply_chat_action(ChatAction.TYPING)
     )
 
-    thread = gen_thread(dialog)
+    thread = gen_thread(dialog, search_result=search_result)
     return await type_in_message(resp_message, stream_chat_by_sentences(thread))
+
+
+async def chat_core(client: Client, message: Message, is_reply: bool = False) -> Optional[Message]:
+    return await reply_handler(client, message, is_reply)
 
 
 @ensure_not_bl
 @ensure_gpt_auth
 async def command_chat(client: Client, message: Message) -> Optional[Message]:
+    msg_store.add(message)
     command = message.text
     command_handle = command.split(' ')[0].split('@')[0].lower()
     content_index = command.find(' ')
@@ -92,7 +105,7 @@ async def command_chat(client: Client, message: Message) -> Optional[Message]:
         if not reply:
             return await message.reply_text(f'{command_handle} 不支持无输入调用。')
 
-    return await reply_handler(client, message)
+    return await chat_core(client, message, False)
 
 
 @ensure_not_bl

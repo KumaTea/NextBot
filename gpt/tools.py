@@ -91,16 +91,17 @@ def gpt_to_bot(text: str) -> str:
     return text
 
 
-def gen_thread(dialogue: list[Message], custom_inst: str = None) -> list[dict]:
+def gen_thread(dialogue: list[Message], custom_inst: str = None, search_result: str = None) -> list[dict]:
+    # detect multiuser
     multiuser = False
     for m in dialogue.copy():
         if not m.from_user:
             dialogue.remove(m)
-
     user_ids = list(set([m.from_user.id for m in dialogue] + [self_id]))
     if len(user_ids) > 2:
         multiuser = True
 
+    # generate instructions
     inst = {}
     if custom_inst:
         inst = {'role': 'system', 'content': custom_inst}
@@ -122,9 +123,11 @@ def gen_thread(dialogue: list[Message], custom_inst: str = None) -> list[dict]:
     if multiuser:
         inst['content'] += ' ' + multiuser_inst
 
+    # initialize thread
     thread = [inst]
     dialog_thread = []
 
+    # generate dialog thread
     for message in dialogue:
         if message.text:
             text = process_message(message) or ' '
@@ -142,5 +145,11 @@ def gen_thread(dialogue: list[Message], custom_inst: str = None) -> list[dict]:
         logging.info(f'[func_chat]\t' + m['role'] + ': ' + m['content'])
     dialog_thread = dialog_thread[-max_dialog:]
     thread.extend(dialog_thread)
+
+    # add search result
+    if search_result:
+        search_result_text = 'Web Search Result:\n' + search_result
+        thread.append({'role': 'system', 'content': search_result_text})
+
     PrettyPrinter().pprint(thread)
     return thread

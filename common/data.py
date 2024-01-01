@@ -28,6 +28,9 @@ gpt_inst = ("You are ChatGPT. "
 multiuser_inst = (f'Format is "@username: message", '
                   f'your reply must start with "@ChatGPT: "')
 
+web_inst = ('After user input, you\'ll see a web search result. '
+            'If the result helps, answer based on it, otherwise ignore it.')
+
 # credit: https://arxiv.org/abs/2309.03409
 magic_prompt = 'Take a deep breath and work on this problem step-by-step. '
 less_magic_prompt = 'Break the question down.'
@@ -122,3 +125,10 @@ whisper_blacklist = [
 voice_tag = '#kuma语音王'
 
 MEDIA_BOT_CMD = '/opt/conda/envs/rbsk/bin/python3 mediabot.py >> /tmp/media.log 2>&1'
+
+USER_AGENT = (
+    'Mozilla/5.0 (Windows NT 10.0; Win64; x64) '
+    'AppleWebKit/537.36 (KHTML, like Gecko) '
+    'Chrome/120.0.0.0 '
+    'Safari/537.36'
+)
