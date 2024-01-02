@@ -4,15 +4,16 @@ from bot.session import msg_store
 from pyrogram.types import Message
 from bot.auth import ensure_not_bl
 from func.voice import process_voice
+from func.chat.core import chat_core
 from common.info import self_id, username
+from func.chat.cmd import ensure_gpt_auth
 from common.data import voice_tag, gpt_auth_info
-from func.chat import chat_core, ensure_gpt_auth
 
 
 @ensure_gpt_auth
 async def replied_chat(client: Client, message: Message) -> Optional[Message]:
     msg_store.add(message)
-    return await chat_core(client, message, False)
+    return await chat_core(client, message)
 
 
 @ensure_not_bl

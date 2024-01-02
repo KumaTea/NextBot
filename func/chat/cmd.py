@@ -1,47 +1,18 @@
 import random
 import asyncio
-from time import time
 from pyrogram import Client
+from typing import Optional
 from gpt.auth import gpt_auth
-from search.main import search
-from bot.tools import get_dialog
+from gpt.tools import gen_thread
 from bot.session import msg_store
 from bot.auth import ensure_not_bl
+from common.info import gpt_admins
 from gpt.auth import ensure_gpt_auth
-from typing import Optional, AsyncGenerator
 from gpt.core import stream_chat_by_sentences
-from pyrogram.enums.parse_mode import ParseMode
 from pyrogram.types import Message, CallbackQuery
 from pyrogram.enums.chat_action import ChatAction
 from common.data import smart_inst, thinking_emojis
-from common.info import gpt_admins, max_chunk, min_edit_interval
-from gpt.tools import gen_thread, gpt_to_bot, trim_starting_username, process_message, get_cmd_type
-
-
-async def type_in_message(message: Message, generator: AsyncGenerator[str, None]) -> Message:
-    text = ''
-    msg = message
-    parse_mode = None
-    chunk_len = 0
-    last_edit = time()
-    async for chunk in generator:
-        chunk = gpt_to_bot(trim_starting_username(chunk))
-        text += chunk
-        chunk_len += len(chunk)
-        if '`' in text:
-            parse_mode = ParseMode.MARKDOWN
-        if text.lower().startswith('@chatgpt: '):
-            text = text[len('@chatgpt: '):]
-        if chunk_len > max_chunk and time() - last_edit > min_edit_interval:
-            msg = await msg.edit_text(text, parse_mode=parse_mode, disable_web_page_preview=True)
-            chunk_len = 0
-            last_edit = time()
-    # last words
-    if msg.text.strip().lower()[-max_chunk:] != text.strip().lower()[-max_chunk:]:
-        await asyncio.sleep(max(0, min_edit_interval - (time() - last_edit)))
-        msg = await msg.edit_text(text, parse_mode=parse_mode, disable_web_page_preview=True)
-    msg_store.add(msg)
-    return msg
+from func.chat.core import type_in_message, chat_core
 
 
 async def callback_gpt_auth(client: Client, callback_query: CallbackQuery) -> tuple:
@@ -69,32 +40,6 @@ async def gpt_callback_handler(client, callback_query):
         return await callback_gpt_auth(client, callback_query)
 
 
-async def get_search_result(message: Message, need_search: bool = False) -> str:
-    if need_search:
-        query = process_message(message)
-        return await search(query)
-    return ''
-
-
-async def reply_handler(client: Client, message: Message, need_search: bool = False) -> Message:
-    resp_message = await message.reply_text(random.choice(thinking_emojis) + '❓')
-
-    if get_cmd_type(message.text) != 'chat':
-        need_search = False
-    dialog, search_result, _ = await asyncio.gather(
-        get_dialog(client, message),
-        get_search_result(message, need_search),
-        message.reply_chat_action(ChatAction.TYPING)
-    )
-
-    thread = gen_thread(dialog, search_result=search_result)
-    return await type_in_message(resp_message, stream_chat_by_sentences(thread))
-
-
-async def chat_core(client: Client, message: Message, need_search: bool = False) -> Optional[Message]:
-    return await reply_handler(client, message, need_search)
-
-
 @ensure_not_bl
 @ensure_gpt_auth
 async def command_chat(client: Client, message: Message) -> Optional[Message]:
@@ -108,7 +53,7 @@ async def command_chat(client: Client, message: Message) -> Optional[Message]:
         if not reply:
             return await message.reply_text(f'{command_handle} 不支持无输入调用。')
 
-    return await chat_core(client, message, True)
+    return await chat_core(client, message)
 
 
 @ensure_not_bl

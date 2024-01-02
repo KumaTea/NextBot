@@ -28,6 +28,10 @@ gpt_inst = ("You are ChatGPT. "
 multiuser_inst = (f'Format is "@username: message", '
                   f'your reply must start with "@ChatGPT: "')
 
+search_inst = ('If you need to search the web, '
+               'send only the search query in format "/search query". '
+               'If not, just reply directly.')
+
 web_inst = ('After user input, you\'ll see a web search result. '
             'If the result helps, answer based on it, otherwise ignore it.')
 
