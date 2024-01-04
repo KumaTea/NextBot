@@ -68,13 +68,28 @@ async def get_search_result(text: str) -> str:
     return await search(query)
 
 
-async def chat_core(client: Client, message: Message) -> Message:
+def no_input(message: Message) -> bool:
+    command = message.text
+    content_index = command.find(' ')
+    reply = message.reply_to_message
+    if content_index == -1:
+        # no text
+        if not reply:
+            return True
+    return False
+
+
+async def chat_core(client: Client, message: Message, query_dialog: bool = True) -> Message:
     resp_message = await message.reply_text(random.choice(thinking_emojis) + '❓')
 
-    dialog, _ = await asyncio.gather(
-        get_dialog(client, message),
-        message.reply_chat_action(ChatAction.TYPING)
-    )
-
-    thread = gen_thread(dialog)
+    if query_dialog:
+        dialog, _ = await asyncio.gather(
+            get_dialog(client, message),
+            message.reply_chat_action(ChatAction.TYPING)
+        )
+        thread = gen_thread(dialog)
+    else:
+        await message.reply_chat_action(ChatAction.TYPING)
+        dialog = [message]
+        thread = gen_thread([message])
     return await type_in_message(resp_message, stream_chat_by_sentences(thread), dialog)

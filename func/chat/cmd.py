@@ -1,18 +1,13 @@
-import random
 import asyncio
 from pyrogram import Client
 from typing import Optional
 from gpt.auth import gpt_auth
-from gpt.tools import gen_thread
 from bot.session import msg_store
 from bot.auth import ensure_not_bl
 from common.info import gpt_admins
 from gpt.auth import ensure_gpt_auth
-from gpt.core import stream_chat_by_sentences
 from pyrogram.types import Message, CallbackQuery
-from pyrogram.enums.chat_action import ChatAction
-from common.data import smart_inst, thinking_emojis
-from func.chat.core import type_in_message, chat_core
+from func.chat.core import chat_core, no_input
 
 
 async def callback_gpt_auth(client: Client, callback_query: CallbackQuery) -> tuple:
@@ -43,32 +38,22 @@ async def gpt_callback_handler(client, callback_query):
 @ensure_not_bl
 @ensure_gpt_auth
 async def command_chat(client: Client, message: Message) -> Optional[Message]:
-    msg_store.add(message)
-    command = message.text
-    command_handle = command.split(' ')[0].split('@')[0].lower()
-    content_index = command.find(' ')
-    reply = message.reply_to_message
-    if content_index == -1:
-        # no text
-        if not reply:
-            return await message.reply_text(f'{command_handle} 不支持无输入调用。')
+    if no_input(message):
+        command = message.text
+        command_handle = command.split(' ')[0].split('@')[0].lower()
+        return await message.reply_text(f'{command_handle} 不支持无输入调用。')
 
+    msg_store.add(message)
     return await chat_core(client, message)
 
 
 @ensure_not_bl
 @ensure_gpt_auth
 async def command_smart(client: Client, message: Message) -> Optional[Message]:
-    command = message.text
-    content_index = command.find(' ')
-    if content_index == -1:
-        # no text
-        return await message.reply_text('/smart 不支持无输入调用。')
+    if no_input(message):
+        command = message.text
+        command_handle = command.split(' ')[0].split('@')[0].lower()
+        return await message.reply_text(f'{command_handle} 不支持无输入调用。')
 
-    resp_message = await message.reply_text(random.choice(thinking_emojis) + '❓')
-    thread = gen_thread([message], custom_inst=smart_inst)
-    result, _ = await asyncio.gather(
-        type_in_message(resp_message, stream_chat_by_sentences(thread)),
-        message.reply_chat_action(ChatAction.TYPING)
-    )
-    return result
+    msg_store.add(message)
+    return await chat_core(client, message, query_dialog=False)
