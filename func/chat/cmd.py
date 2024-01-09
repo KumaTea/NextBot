@@ -6,8 +6,8 @@ from bot.session import msg_store
 from bot.auth import ensure_not_bl
 from common.info import gpt_admins
 from gpt.auth import ensure_gpt_auth
-from pyrogram.types import Message, CallbackQuery
 from func.chat.core import chat_core, no_input
+from pyrogram.types import Message, CallbackQuery
 
 
 async def callback_gpt_auth(client: Client, callback_query: CallbackQuery) -> tuple:
