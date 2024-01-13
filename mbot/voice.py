@@ -32,7 +32,8 @@ async def transcribe_voice(voice_path: str) -> str:
     if not text.strip():
         return '啥也没说'
     for word in whisper_blacklist:
-        if word in text:
+        if word.replace(' ', '').lower() in text.replace(' ', '').lower():
+            logging.warning(f'[func_voice]\tBlacklisted word: {word}')
             return '啥也没说'
 
     return text

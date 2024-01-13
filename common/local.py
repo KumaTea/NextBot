@@ -3,7 +3,7 @@ from typing import List
 from urllib.request import urlopen
 
 
-LOCAL_URL = 'https://us.lan.kmtea.eu'
+LOCAL_URL = 'https://hm.lan.kmtea.eu'
 
 
 def get_url_text(url: str) -> str:
