@@ -62,7 +62,8 @@ def ensure_gpt_auth(func):
         if has_gpt_auth(client, message):
             return await func(client, message)
         else:
-            return await ask_for_gpt_auth(client, message)
+            # return await ask_for_gpt_auth(client, message)
+            return None
     return wrapper
 
 
