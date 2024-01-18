@@ -117,14 +117,14 @@ thinking_emojis = list(
 )
 
 whisper_blacklist = [
-    '字幕by索兰娅',
-    '明鏡與點點',
-    '明镜与点点',  # 请不吝点赞订阅转发打赏支持明镜与点点栏目
+    '字幕by索兰娅',  # 字幕By索兰娅 / https://t.me/rkmiu/130590
+    '明鏡與點點', '明镜与点点',  # 请不吝点赞订阅转发打赏支持明镜与点点栏目
     'Amara',  # 字幕由Amara.org社区提供 / 小編字幕由Amara.org社區提供 / 由 Amara.org 社群提供的字幕
     '沛隊字幕小組',  # CC字幕 by 沛隊字幕小組
     'MING PAO',  # MING PAO CANADA MING PAO TORONTO
     '訂閱我們的頻道',  # 也請別忘了分享出去並按一個讚哦 並且記得訂閱我們的頻道 才能收到最新消息喔
     '官方網址放在下面',  # 官方網址放在下面,謝謝觀看
+    '我们的频道叫做',  # 大家好 我们的频道叫做 / https://t.me/echoesofdream/71459
 ]
 
 voice_tag = '#kuma语音王'
