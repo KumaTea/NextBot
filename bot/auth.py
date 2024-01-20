@@ -33,7 +33,7 @@ def ensure_not_bl(func):
                 return None
             # premium?
             is_premium = msg.from_user.is_premium
-            is_known = user_id in known_user_ids.data
+            is_known = user_id in known_user_ids
             if is_premium and not is_known:
                 logging.warning(f'User {user_id} is a premium user! Ignoring message.')
                 return None
