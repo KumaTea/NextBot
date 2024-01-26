@@ -1,7 +1,7 @@
 import os
 import asyncio
 from pyrogram import Client
-from bot.auth import ensure_not_bl
+from bot.auth import ensure_auth
 from pyrogram.types import Message
 from common.data import TEMP_DIR, MEDIA_BOT_CMD
 from pyrogram.enums.parse_mode import ParseMode
@@ -12,7 +12,7 @@ TASK_FILE = f'{TEMP_DIR}/task.txt'
 STATUS_FILE = f'{TEMP_DIR}/media.run'
 
 
-@ensure_not_bl
+@ensure_auth
 async def command_cap(client: Client, message: Message) -> Message:
     reply = message.reply_to_message
     if not (reply and reply.photo):

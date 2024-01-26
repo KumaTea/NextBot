@@ -5,7 +5,7 @@ from pyrogram.types import Message, CallbackQuery
 from common.local import bl_users, known_group, known_user_ids
 
 
-def ensure_not_bl(func):
+def ensure_auth(func):
     async def wrapper(client: Client, obj: Union[Message, CallbackQuery]):
 
         # target the message

@@ -7,14 +7,11 @@ words = {
     'fktp': '疯狂透批',
     'tpr': '透批人',
     # 'tp': '透批',  # not to confuse with 'INTP', etc.
-    'npy': '男朋友',
+    'npy': '男朋友',  # default, don't bb me
     'xmsl': '羡慕死了',
 }
 
 nicknames = {
     # the first nickname will be used by bot
-    'realKumaTea': ['kuma', '蓝毛', '蓝头人'],
-    'RimusTG': ['莱姆', '莱德', '晕比'],
-    'atlasnow': ['图批', '图图'],
-    'jiujiucauzyu': ['嗨比', '小黑', '小嗨'],
+    # 'realKumaTea': ['kuma', '蓝毛', '蓝头人'],
 }

@@ -128,4 +128,4 @@ def get_url_str(url: str) -> str:
 
 
 if __name__ == '__main__':
-    sort_imports(r'D:\GitHub\TGBot')
+    sort_imports(pwd)

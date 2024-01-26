@@ -1,8 +1,8 @@
 from typing import Optional
 from pyrogram import Client
+from bot.auth import ensure_auth
 from bot.session import msg_store
 from pyrogram.types import Message
-from bot.auth import ensure_not_bl
 from func.voice import process_voice
 from func.chat.core import chat_core
 from common.info import self_id, username
@@ -16,7 +16,7 @@ async def replied_chat(client: Client, message: Message) -> Optional[Message]:
     return await chat_core(client, message)
 
 
-@ensure_not_bl
+@ensure_auth
 async def process_msg(client: Client, message: Message) -> Optional[Message]:
     if message.from_user:
         user_id = message.from_user.id

@@ -2,8 +2,8 @@ import asyncio
 from pyrogram import Client
 from typing import Optional
 from gpt.auth import gpt_auth
+from bot.auth import ensure_auth
 from bot.session import msg_store
-from bot.auth import ensure_not_bl
 from common.info import gpt_admins
 from gpt.auth import ensure_gpt_auth
 from func.chat.core import chat_core, no_input
@@ -35,7 +35,7 @@ async def gpt_callback_handler(client, callback_query):
         return await callback_gpt_auth(client, callback_query)
 
 
-@ensure_not_bl
+@ensure_auth
 @ensure_gpt_auth
 async def command_chat(client: Client, message: Message) -> Optional[Message]:
     if no_input(message):
@@ -47,7 +47,7 @@ async def command_chat(client: Client, message: Message) -> Optional[Message]:
     return await chat_core(client, message)
 
 
-@ensure_not_bl
+@ensure_auth
 @ensure_gpt_auth
 async def command_smart(client: Client, message: Message) -> Optional[Message]:
     if no_input(message):
