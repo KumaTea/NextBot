@@ -1,6 +1,6 @@
 import os
 
-version = '3.0.1.320'
+version = '3.0.1.324'
 channel = 'local' if os.name == 'nt' else 'cloud'
 username = 'rbskbot'
 
@@ -16,3 +16,5 @@ max_dialog = 10  # conversations
 max_chunk = 25  # characters
 min_edit_interval = 5  # seconds
 max_voice = 60  # seconds
+
+gpt_model = 'gpt-4-turbo-preview'

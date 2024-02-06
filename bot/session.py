@@ -25,5 +25,4 @@ gpt = aiClient(
     organization=config['openai']['organization']
 )
 
-gpt_model = config['openai']['model']
 msg_store = MsgStore()

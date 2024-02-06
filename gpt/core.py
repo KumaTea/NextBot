@@ -1,5 +1,6 @@
-from bot.session import *
+from bot.session import gpt
 from typing import AsyncGenerator
+from common.info import gpt_model
 
 
 periods = [
