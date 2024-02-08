@@ -1,11 +1,12 @@
 import re
 import pprint
-from common.data import *
-from gpt.glossary import *
 from bot.session import logging
 from pyrogram.types import Message
+from gpt.glossary import words, nicknames
 from pyrogram.parser.parser import Parser
 from common.info import self_id, max_dialog
+from common.data import cmd_re, start_user_re, bot_commands
+from gpt.data import gpt_inst, multiuser_inst, search_inst, web_inst, smart_inst, debate_inst
 
 
 cmd_pattern = re.compile(cmd_re)

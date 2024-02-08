@@ -24,32 +24,32 @@ def ensure_auth(func):
             user_id = msg.from_user.id
             # blocked?
             if user_id in bl_users:
-                logging.warning(f'User {user_id} is in blacklist! Ignoring message.')
+                logging.debug(f'User {user_id} is in blacklist! Ignoring message.')
                 return None
             # no pic?
             user_pic = msg.from_user.photo
             if not user_pic:
-                logging.warning(f'User {user_id} has no profile picture! Ignoring message.')
+                logging.debug(f'User {user_id} has no profile picture! Ignoring message.')
                 return None
             # premium?
             is_premium = msg.from_user.is_premium
             is_known = user_id in known_user_ids
             if is_premium and not is_known:
-                logging.warning(f'User {user_id} is a premium user! Ignoring message.')
+                logging.debug(f'User {user_id} is a premium user! Ignoring message.')
                 return None
 
         # replies
         if msg.reply_to_message and msg.reply_to_message.from_user:
             user_id = msg.reply_to_message.from_user.id
             if user_id in bl_users:
-                logging.warning(f'Replied user {user_id} is in blacklist! Ignoring message.')
+                logging.debug(f'Replied user {user_id} is in blacklist! Ignoring message.')
                 return None
 
         # forwards
         if msg.forward_from:
             user_id = msg.forward_from.id
             if user_id in bl_users:
-                logging.warning(f'Forwarded user {user_id} is in blacklist! Ignoring message.')
+                logging.debug(f'Forwarded user {user_id} is in blacklist! Ignoring message.')
                 return None
 
         # all good

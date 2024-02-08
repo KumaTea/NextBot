@@ -1,10 +1,11 @@
+import os
 import asyncio
-from common.data import *
 from pyrogram import Client
 from bot.tools import gen_uuid
 from pyrogram.types import Message
 from bot.session import gpt, logging
 from pyrogram.enums.parse_mode import ParseMode
+from gpt.data import whisper_blacklist, voice_tag
 
 
 async def save_voice(message: Message) -> str:

@@ -8,7 +8,7 @@ from bot.tools import get_dialog
 from bot.session import msg_store
 from typing import AsyncGenerator
 from pyrogram.types import Message
-from common.data import thinking_emojis
+from gpt.data import thinking_emojis
 from gpt.core import stream_chat_by_sentences
 from pyrogram.enums.parse_mode import ParseMode
 from pyrogram.enums.chat_action import ChatAction

@@ -1,15 +1,17 @@
 from typing import Optional
 from pyrogram import Client
+from gpt.data import voice_tag
 from bot.auth import ensure_auth
 from bot.session import msg_store
 from pyrogram.types import Message
 from func.voice import process_voice
 from func.chat.core import chat_core
+from gpt.auth import ensure_gpt_auth
+from common.data import gpt_auth_info
 from common.info import self_id, username
-from func.chat.cmd import ensure_gpt_auth
-from common.data import voice_tag, gpt_auth_info
 
 
+# @ensure_auth has been decorated before this function is called
 @ensure_gpt_auth
 async def replied_chat(client: Client, message: Message) -> Optional[Message]:
     msg_store.add(message)

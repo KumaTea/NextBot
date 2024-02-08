@@ -1,7 +1,7 @@
-from common.data import *
 from bot.session import bot
 from pyrogram import filters
 from handlers.functions import *
+from common.data import bot_commands
 from handlers.messages import process_msg
 from handlers.callbacks import process_callback
 from pyrogram.handlers import MessageHandler, CallbackQueryHandler
