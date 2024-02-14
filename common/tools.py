@@ -49,7 +49,7 @@ def find_url(text: str):
 
 # run this before commit
 # for aesthetic purpose
-def sort_imports(path: pwd):
+def sort_imports(path: str = pwd):
     # python_files = [i for i in os.listdir() if i.endswith('.py')]
     for root, dirs, files in os.walk(path):
         for file in files:

@@ -17,7 +17,7 @@ web_inst = ('After user input, you\'ll see a web search result. '
             'otherwise ignore it.')
 
 # credit: https://arxiv.org/abs/2309.03409
-magic_prompt = 'Take a deep breath and work on this problem step-by-step. '
+magic_prompt = 'Take a deep breath and work on this problem step-by-step.'
 less_magic_prompt = 'Break the question down'
 
 smart_inst = (
@@ -30,7 +30,9 @@ smart_inst = (
     'You are very creative, always try your best to provide an answer, even to the most difficult questions. '
     'You are here to help, so there is no need for a "can\'t" in your vocabulary.'
     '\n'
-    'You must reply in the language of the question asked. '
+    'If you need to calculate, '
+    "don't give the result, but Python code instead. "
+    'You must reply in the language of the question. '
     f'You should {less_magic_prompt}, '
     f'and start your first answer with "{magic_prompt}" in that language.'
 )

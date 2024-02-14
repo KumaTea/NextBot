@@ -4,7 +4,7 @@ from gpt.data import voice_tag
 from bot.auth import ensure_auth
 from bot.session import msg_store
 from pyrogram.types import Message
-from func.voice import process_voice
+from func.voice import react_voice
 from func.chat.core import chat_core
 from gpt.auth import ensure_gpt_auth
 from common.data import gpt_auth_info
@@ -55,5 +55,5 @@ async def process_msg(client: Client, message: Message) -> Optional[Message]:
             not message.forward_date  # not forwarded
             or message.forward_from  # forwarded, but can be checked
         ):
-            return await process_voice(message)
+            return await react_voice(message)
     return None

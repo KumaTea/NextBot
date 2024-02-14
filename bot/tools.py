@@ -1,7 +1,10 @@
 import uuid
+import random
+import asyncio
 from pyrogram import Client
 from common.info import max_dialog
 from pyrogram.types import Message
+from pyrogram.errors import FloodWait
 from bot.session import bot, msg_store, logging
 
 
@@ -37,3 +40,31 @@ def gen_uuid(length: int = 4) -> str:
     :return: A random UUID string.
     """
     return str(uuid.uuid4())[:length]
+
+
+def retry_on_flood(tries: int = 1):
+    """
+    Retry the function after the flood wait time.
+    :param tries: The number of retries.
+    """
+    def decorator(func: callable):
+        async def wrapper(*args, **kwargs):
+            inner_tries = tries
+            e = None
+            while inner_tries:
+                try:
+                    return await func(*args, **kwargs)
+                except FloodWait as e:
+                    wait_time = e.value + 1 + random.random()
+                    logging.warning(f'[tg_tools]\t\tFlood wait of {func.__name__} for {wait_time} seconds')
+                    await asyncio.sleep(wait_time)
+                    inner_tries -= 1
+                # except Exception as e:
+                #     raise e
+            # retry count exceeded
+            if e:
+                raise e
+            # else:
+            #     return None
+        return wrapper
+    return decorator

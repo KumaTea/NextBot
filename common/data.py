@@ -8,8 +8,7 @@ else:
     pwd = '/home/kuma/bots/rbsk'
     TEMP_DIR = '/dev/shm'
 
-REBOOT_CMD = "kill $(ps aux | grep tail | head -n 1 | awk '{print $2}')"
-# tail is the last process in docker/run-docker.sh
+REBOOT_CMD = "kill $(ps aux | grep python3 | head -n 1 | awk '{print $2}')"
 
 url_regex = r'https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|' \
             r'www\.[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|' \
