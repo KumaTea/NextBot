@@ -2,6 +2,7 @@ import uuid
 import random
 import asyncio
 from pyrogram import Client
+from typing import Callable
 from common.info import max_dialog
 from pyrogram.types import Message
 from pyrogram.errors import FloodWait
@@ -47,7 +48,7 @@ def retry_on_flood(tries: int = 1):
     Retry the function after the flood wait time.
     :param tries: The number of retries.
     """
-    def decorator(func: callable):
+    def decorator(func: Callable):
         async def wrapper(*args, **kwargs):
             inner_tries = tries
             e = None
