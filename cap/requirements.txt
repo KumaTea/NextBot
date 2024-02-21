@@ -1,7 +1,14 @@
 flask
+
+# -i https://mirror.sjtu.edu.cn/pytorch-wheels/cpu/index.html
 torch
+
 pillow
+gunicorn
+# paddleocr
 accelerate
 transformers
-paddlepaddle
-paddleocr
+
+# defaults to avx, which may cause Illegal instruction
+# -f https://www.paddlepaddle.org.cn/whl/linux/mkl/noavx/stable.html
+# paddlepaddle

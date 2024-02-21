@@ -8,7 +8,11 @@ else:
     pwd = '/home/kuma/bots/rbsk'
     TEMP_DIR = '/dev/shm'
 
-REBOOT_CMD = "kill $(ps aux | grep python3 | head -n 1 | awk '{print $2}')"
+# REBOOT_CMD = "killall python3; killall tail"
+REBOOT_CMD = (
+    "kill $(ps aux | grep python3 | head -n 1 | awk '{print $2}'); "
+    "kill $(ps aux | grep tail | head -n 1 | awk '{print $2}')"
+)
 
 url_regex = r'https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|' \
             r'www\.[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|' \
@@ -66,6 +70,6 @@ MEDIA_BOT_CMD = '/opt/conda/envs/rbsk/bin/python3 mediabot.py >> /tmp/media.log 
 USER_AGENT = (
     'Mozilla/5.0 (Windows NT 10.0; Win64; x64) '
     'AppleWebKit/537.36 (KHTML, like Gecko) '
-    'Chrome/121.0.0.0 '
+    'Chrome/122.0.0.0 '
     'Safari/537.36'
 )

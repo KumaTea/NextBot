@@ -1,6 +1,6 @@
 from session import logging
 from flask import Flask, request, jsonify
-from handler import ocr_handler, cap_handler
+from handler import cap_handler  # , ocr_handler
 
 
 app = Flask(__name__)
@@ -11,12 +11,13 @@ def ocr():
     if request.method == 'POST':
         logging.info('[OCR]\treceived request...')
         if request.files:
-            image = request.files['image'].read()
-            lang = request.form.get('lang', 'ch')
-            logging.info(f'[OCR]\tprocessing...')
-            result, status = ocr_handler(image, lang)
-            logging.info('[OCR]\tresponding...')
-            return jsonify({'result': result}), status
+            # image = request.files['image'].read()
+            # lang = request.form.get('lang', 'ch')
+            # logging.info(f'[OCR]\tprocessing...')
+            # result, status = ocr_handler(image, lang)
+            # logging.info('[OCR]\tresponding...')
+            # return jsonify({'result': result}), status
+            return jsonify({'result': '由于本机 CPU 不支持 AVX 指令集，OCR 功能暂时停用'}), 200
         else:
             return jsonify({'error': 'No image received.'}), 404
 

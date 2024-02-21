@@ -22,7 +22,6 @@ async def type_in_message(
         dialog: list[Message] = None
 ) -> Message:
     text = ''
-    msg = message
     parse_mode = None
     chunk_len = 0
     last_edit = time()
@@ -38,19 +37,23 @@ async def type_in_message(
         if text.lower().startswith('/search'):
             is_search = True
         if not is_search and chunk_len > max_chunk and time() - last_edit > min_edit_interval:
-            msg = await msg.edit_text(text, parse_mode=parse_mode, disable_web_page_preview=True)
+            message = await message.edit_text(text, parse_mode=parse_mode, disable_web_page_preview=True)
             chunk_len = 0
             last_edit = time()
     if is_search:
         logging.info(f'GPT has requested: {text}')
-        search_result = await get_search_result(text)
+        # search_result = await get_search_result(text)
+        search_result, message = await asyncio.gather(
+            get_search_result(text),
+            message.edit_text('进行一个索的搜……')
+        )
         return await re_ask_with_search_result(message, search_result, dialog)
     # last words
-    if not is_search and msg.text.strip().lower()[-max_chunk:] != text.strip().lower()[-max_chunk:]:
+    if not is_search and message.text.strip().lower()[-max_chunk:] != text.strip().lower()[-max_chunk:]:
         await asyncio.sleep(max(0, min_edit_interval - (time() - last_edit)))
-        msg = await msg.edit_text(text, parse_mode=parse_mode, disable_web_page_preview=True)
-    msg_store.add(msg)
-    return msg
+        message = await message.edit_text(text, parse_mode=parse_mode, disable_web_page_preview=True)
+    msg_store.add(message)
+    return message
 
 
 async def re_ask_with_search_result(

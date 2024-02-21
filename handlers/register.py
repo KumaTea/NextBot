@@ -18,5 +18,8 @@ def register_handlers():
     # group messages
     bot.add_handler(MessageHandler(process_msg, filters.group))
 
+    # private commands
+    bot.add_handler(MessageHandler(command_reboot, filters.command(['restart', 'reboot']) & filters.private))
+
     # callbacks
     bot.add_handler(CallbackQueryHandler(process_callback))
