@@ -1,6 +1,6 @@
 from session import logging
-from flask import Flask, request, jsonify
 from handler import cap_handler  # , ocr_handler
+from flask import Flask, request, jsonify
 
 
 app = Flask(__name__)

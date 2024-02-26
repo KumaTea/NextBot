@@ -58,9 +58,9 @@ bot_debug_info = (
 )
 
 bot_commands = {
-    'chat': ['chat', 'say', 'c'],
-    'smart': ['smart', 's'],
-    'debate': ['debate', 'd', 'g'],
+    'chat': ['chat'],
+    'smart': ['smart'],
+    'debate': ['debate'],
     'ocr': ['ocr'],
     'cap': ['cap'],
 }
