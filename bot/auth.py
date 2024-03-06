@@ -6,10 +6,12 @@ from common.local import bl_users, known_group, known_user_ids
 
 
 def ensure_auth(func):
-    async def wrapper(client: Client, obj: Union[Message, CallbackQuery]):
+    async def wrapper(client: Client, obj: Union[Message, CallbackQuery, list[Message]]):
 
         # target the message
-        if isinstance(obj, CallbackQuery):
+        if isinstance(obj, list):
+            msg = obj[0]
+        elif isinstance(obj, CallbackQuery):
             msg = obj.message
         else:
             msg = obj

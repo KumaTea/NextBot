@@ -1,11 +1,7 @@
 .idea
-admin*
-token*
 __pycache__
 data
-.ipynb_checkpoints
 *.ini
-life
 tmp
 *.session
 *.log

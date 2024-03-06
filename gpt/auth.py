@@ -3,6 +3,7 @@ from typing import Optional
 from pyrogram import Client
 from common.info import gpt_admins
 from pyrogram.types import Message
+from common.local import trusted_group
 from pyrogram.enums.parse_mode import ParseMode
 from common.data import gpt_users_file, gpt_auth_info, bot_debug_info
 from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton
@@ -36,9 +37,15 @@ class GPTAuth:
             self.write_users()
 
 
+gpt_auth = GPTAuth()
+
+
 def has_gpt_auth(client: Client, message: Message) -> bool:
     if message.from_user:
+        chat_id = message.chat.id
         user_id = message.from_user.id
+        if chat_id in trusted_group:
+            return True
         if user_id in gpt_auth.users:
             return True
     return False
@@ -65,6 +72,3 @@ def ensure_gpt_auth(func):
             # return await ask_for_gpt_auth(client, message)
             return None
     return wrapper
-
-
-gpt_auth = GPTAuth()
