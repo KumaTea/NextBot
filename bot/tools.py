@@ -6,7 +6,7 @@ from typing import Callable
 from common.info import max_dialog
 from pyrogram.types import Message
 from pyrogram.errors import FloodWait
-from bot.session import bot, msg_store, logging
+from bot.session import bot, logging, msg_store
 
 
 async def get_message(chat_id: int, msg_id: int, client: Client = bot) -> Message:

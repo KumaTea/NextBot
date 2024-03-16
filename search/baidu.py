@@ -1,5 +1,5 @@
 import aiohttp
-from bs4 import BeautifulSoup, Tag
+from bs4 import Tag, BeautifulSoup
 from common.data import USER_AGENT
 from search.tools import tag_to_text
 from bot.session import config, logging

@@ -5,13 +5,13 @@ from common.info import gpt_admins
 from pyrogram.types import Message
 from common.local import trusted_group
 from pyrogram.enums.parse_mode import ParseMode
-from common.data import gpt_users_file, gpt_auth_info, bot_debug_info
-from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton
+from common.data import gpt_auth_info, bot_debug_info, gpt_users_file
+from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 
 
 class GPTAuth:
-    def __init__(self):
-        self.users = []
+    def __init__(self, users: set[int] = None):
+        self.users = users or set()
         self.read_users()
         if not self.users:
             self.users = gpt_admins.copy()
@@ -20,15 +20,15 @@ class GPTAuth:
         if os.path.isfile(gpt_users_file):
             with open(gpt_users_file, 'r') as file:
                 users = file.read().splitlines()
-            self.users = [int(user) for user in users]
+            self.users = set(int(user) for user in users)
 
     def write_users(self):
         with open(gpt_users_file, 'w') as file:
-            file.write('\n'.join([str(user) for user in self.users]))
+            file.write('\n'.join(str(user) for user in self.users))
 
     def add_user(self, user_id: int):
         if user_id not in self.users:
-            self.users.append(user_id)
+            self.users.add(user_id)
             self.write_users()
 
     def del_user(self, user_id: int):

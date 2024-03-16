@@ -65,11 +65,16 @@ bot_commands = {
     'cap': ['cap'],
 }
 
-MEDIA_BOT_CMD = '/opt/conda/envs/rbsk/bin/python3 mediabot.py >> /tmp/media.log 2>&1'
+MEDIA_BOT_CMD = 'python3 mediabot.py >> /tmp/media.log 2>&1'
 
 USER_AGENT = (
     'Mozilla/5.0 (Windows NT 10.0; Win64; x64) '
     'AppleWebKit/537.36 (KHTML, like Gecko) '
     'Chrome/122.0.0.0 '
     'Safari/537.36'
+)
+
+TWITTER_USER_AGENT = (
+    # 'Twitterbot/1.0'
+    'TelegramBot (like TwitterBot)'
 )

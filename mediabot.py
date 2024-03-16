@@ -1,5 +1,5 @@
 from mbot.session import bot
-from mbot.handler import handler, STATUS_FILE, StatHolder
+from mbot.handler import handler, StatHolder, STATUS_FILE
 
 
 holder = StatHolder(STATUS_FILE)

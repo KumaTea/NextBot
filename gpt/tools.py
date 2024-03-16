@@ -5,8 +5,8 @@ from pyrogram.types import Message
 from gpt.glossary import words, nicknames
 from pyrogram.parser.parser import Parser
 from common.info import self_id, max_dialog
-from common.data import cmd_re, start_user_re, bot_commands
-from gpt.data import gpt_inst, multiuser_inst, search_inst, web_inst, smart_inst, debate_inst
+from common.data import cmd_re, bot_commands, start_user_re
+from gpt.data import gpt_inst, web_inst, smart_inst, debate_inst, search_inst, multiuser_inst
 
 
 cmd_pattern = re.compile(cmd_re)

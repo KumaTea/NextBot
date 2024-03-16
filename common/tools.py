@@ -3,8 +3,8 @@ import re
 import logging
 from typing import Union
 from urllib.error import HTTPError
-from urllib.request import urlopen, Request
-from common.data import url_regex, pwd, USER_AGENT
+from urllib.request import Request, urlopen
+from common.data import pwd, url_regex, USER_AGENT
 
 
 def trimmer(data: Union[dict, list]):
@@ -63,6 +63,7 @@ def sort_import(file):
     with open(file, 'r', encoding='utf-8') as f:
         lines = f.readlines()
     original_lines = lines.copy()
+
     imports = []
     for line in lines:
         if line.startswith('import ') or line.startswith('from '):
@@ -71,14 +72,39 @@ def sort_import(file):
             break
     if not imports:
         return None
-    imports.sort(key=lambda x: len(x.split('  #')[0]))
+
+    # sort multiple imports
+    # for line in imports:
+    # this is not working
     for i in range(len(imports)):
-        imports[i] = imports[i].rstrip() + '\n'
-    for i in range(len(lines)):
-        if lines[i].startswith('import ') or lines[i].startswith('from '):
-            lines[i] = imports.pop(0)
-        if not imports:
-            break
+        line = imports[i]
+        if ',' in line:
+            # is multiple import
+            comments = line.split('#')[1] if '#' in line else ''
+            import_keyword = line.split('import ')[0] + 'import '
+            modules = line.split('#')[0].split('import ')[1].split(',')
+            modules = [i.strip() for i in modules]
+            modules.sort(key=lambda x: len(x))
+            imports[i] = import_keyword + ', '.join(modules)
+            if comments:
+                imports[i] += '  # ' + comments.strip()
+            imports[i] += '\n'
+
+    # sort import lines
+    imports.sort(key=lambda x: len(x.split('#')[0].strip()))
+
+    # remove trailing whitespaces
+    for i in range(len(imports)):
+        imports[i] = imports[i].strip() + '\n'
+
+    # replacing
+    # for i in range(len(lines)):
+    #     if lines[i].startswith('import ') or lines[i].startswith('from '):
+    #         lines[i] = imports.pop(0)
+    #     if not imports:
+    #         break
+    lines = imports + lines[len(imports):]
+
     if lines != original_lines:
         with open(file, 'w', encoding='utf-8') as f:
             f.writelines(lines)
@@ -104,27 +130,25 @@ def process_text(text: str) -> str:
     return text
 
 
-def get_url_int_list(url: str) -> list[int]:
-    int_list = []
+def get_url_int_set(url: str) -> set[int]:
+    int_set = set()
     text = get_url_text(url)
     for line in text.splitlines():
         num_text = process_text(line)
         if num_text:
             num = int(num_text)
-            int_list.append(num)
+            int_set.add(num)
+    return int_set
 
-    return int_list
 
-
-def get_url_str_list(url: str) -> list[str]:
-    str_list = []
+def get_url_str_set(url: str) -> set[str]:
+    str_set = set()
     text = get_url_text(url)
     for line in text.splitlines():
         str_text = process_text(line)
         if str_text:
-            str_list.append(str_text)
-
-    return str_list
+            str_set.add(str_text)
+    return str_set
 
 
 def get_url_str(url: str) -> str:

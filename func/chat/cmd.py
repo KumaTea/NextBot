@@ -6,7 +6,7 @@ from bot.auth import ensure_auth
 from bot.session import msg_store
 from common.info import gpt_admins
 from gpt.auth import ensure_gpt_auth
-from func.chat.core import chat_core, no_input
+from func.chat.core import no_input, chat_core
 from pyrogram.types import Message, CallbackQuery
 
 

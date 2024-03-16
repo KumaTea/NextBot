@@ -7,7 +7,7 @@ from common.data import TEMP_DIR, MEDIA_BOT_CMD
 from pyrogram.enums.parse_mode import ParseMode
 
 
-MODELS = ['blip', 'git']
+MODELS = {'blip', 'git'}
 TASK_FILE = f'{TEMP_DIR}/task.txt'
 STATUS_FILE = f'{TEMP_DIR}/media.run'
 

@@ -1,6 +1,6 @@
 import os
 from handlers.register import register_handlers
-from common.data import gpt_data_dir, msg_data_dir, TEMP_DIR
+from common.data import TEMP_DIR, gpt_data_dir, msg_data_dir
 
 
 def starting():

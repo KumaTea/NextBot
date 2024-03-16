@@ -5,7 +5,7 @@ from bot.tools import gen_uuid
 from pyrogram.types import Message
 from bot.session import gpt, logging
 from pyrogram.enums.parse_mode import ParseMode
-from gpt.data import whisper_blacklist, voice_tag
+from gpt.data import voice_tag, whisper_blacklist
 
 
 async def save_voice(message: Message) -> str:

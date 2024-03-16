@@ -1,4 +1,4 @@
-from bot.session import msg_store, logging
+from bot.session import logging, msg_store
 
 
 def stopping():

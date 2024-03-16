@@ -7,9 +7,9 @@ from common.data import TEMP_DIR, MEDIA_BOT_CMD
 from pyrogram.enums.parse_mode import ParseMode
 
 
-CJK = ['ch', 'korean', 'japan', 'chinese_cht']
-LATIN = ['en', 'fr', 'german']
-SUPPORT = CJK + LATIN
+CJK = {'ch', 'korean', 'japan', 'chinese_cht'}
+LATIN = {'en', 'fr', 'german'}
+SUPPORT = CJK | LATIN
 TASK_FILE = f'{TEMP_DIR}/task.txt'
 STATUS_FILE = f'{TEMP_DIR}/media.run'
 
