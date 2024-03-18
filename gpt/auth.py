@@ -3,7 +3,7 @@ from typing import Optional
 from pyrogram import Client
 from common.info import gpt_admins
 from pyrogram.types import Message
-from common.local import trusted_group
+from share.local import trusted_group
 from pyrogram.enums.parse_mode import ParseMode
 from common.data import gpt_auth_info, bot_debug_info, gpt_users_file
 from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup

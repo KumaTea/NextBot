@@ -1,8 +1,8 @@
 import os
 import asyncio
 from pyrogram import Client
-from bot.auth import ensure_auth
 from pyrogram.types import Message
+from share.auth import ensure_auth
 from common.data import TEMP_DIR, MEDIA_BOT_CMD
 from pyrogram.enums.parse_mode import ParseMode
 

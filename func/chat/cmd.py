@@ -2,9 +2,9 @@ import asyncio
 from pyrogram import Client
 from typing import Optional
 from gpt.auth import gpt_auth
-from bot.auth import ensure_auth
 from bot.session import msg_store
 from common.info import gpt_admins
+from share.auth import ensure_auth
 from gpt.auth import ensure_gpt_auth
 from func.chat.core import no_input, chat_core
 from pyrogram.types import Message, CallbackQuery
