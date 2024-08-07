@@ -125,7 +125,8 @@ def gen_thread(dialogue: list[Message], custom_inst: str = None, search_result: 
             elif command == 'debate':
                 inst = {'role': 'system', 'content': debate_inst}
     if not inst:
-        inst = {'role': 'system', 'content': f'{gpt_inst} {search_inst}'}
+        # inst = {'role': 'system', 'content': f'{gpt_inst} {search_inst}'}
+        inst = {'role': 'system', 'content': f'{gpt_inst}'}
     if multiuser:
         inst['content'] += ' ' + multiuser_inst
 
