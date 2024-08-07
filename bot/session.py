@@ -22,7 +22,7 @@ bot = tgClient(
 
 gpt = aiClient(
     api_key=config['openai']['api_key'],
-    organization=config['openai']['organization']
+    base_url=config['openai']['endpoint'],
 )
 
 msg_store = MsgStore()

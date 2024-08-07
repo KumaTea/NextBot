@@ -50,10 +50,13 @@ async def process_msg(client: Client, message: Message) -> Optional[Message]:
             # logging.warning('========  END  ========')
             return None
 
-    if message.voice:
-        if (
-            not message.forward_date  # not forwarded
-            or message.forward_from  # forwarded, but can be checked
-        ):
-            return await react_voice(message)
+    # if message.voice:
+    #     if (
+    #         not message.forward_date  # not forwarded
+    #         or message.forward_from  # forwarded, but can be checked
+    #     ):
+    #         # if forwarded by user with hidden identity, i.e. message.forward_date exists
+    #         # then @ensure_auth cannot ensure both executor and original sender are authenticated
+    #         # otherwise (not fw or fw and checked) the message is safe to be processed
+    #         return await react_voice(message)
     return None

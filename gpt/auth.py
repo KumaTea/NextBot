@@ -43,9 +43,9 @@ gpt_auth = GPTAuth()
 def has_gpt_auth(client: Client, message: Message) -> bool:
     if message.from_user:
         chat_id = message.chat.id
-        user_id = message.from_user.id
         if chat_id in trusted_group:
             return True
+        user_id = message.from_user.id
         if user_id in gpt_auth.users:
             return True
     return False
