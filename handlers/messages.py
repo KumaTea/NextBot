@@ -1,3 +1,4 @@
+import asyncio
 from typing import Optional
 from pyrogram import Client
 from gpt.data import voice_tag
@@ -59,5 +60,8 @@ async def process_msg(client: Client, message: Message) -> Optional[Message]:
             # then @ensure_auth cannot ensure both executor and original sender are authenticated
             # otherwise (not fw or fw and checked) the message is safe to be processed
             # return await react_voice(message)
-            return await message.reply_text(f'{voice_tag} 2.0 升级中，敬请谅解。', quote=False)
+            updating_msg = await message.reply_text(f'{voice_tag} 2.0 升级中，敬请谅解。', quote=False)
+            await asyncio.sleep(5)
+            await updating_msg.delete()
+            return updating_msg
     return None

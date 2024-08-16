@@ -1,8 +1,8 @@
 import os
 import asyncio
+from func.wiki import fetch_wiki
 from handlers.register import register_handlers
 from common.data import TEMP_DIR, gpt_data_dir, msg_data_dir
-from func.wiki import fetch_wiki
 
 
 async def async_starting():

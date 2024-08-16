@@ -1,15 +1,14 @@
+import re
 import asyncio
-
 import aiohttp
-from bs4 import BeautifulSoup
-from dataclasses import dataclass
-from datetime import datetime
+import logging
 from pyrogram import Client
+from bs4 import BeautifulSoup
+from datetime import datetime
+from dataclasses import dataclass
 from pyrogram.types import Message
 from share.auth import ensure_auth
 from gpt.tools import trim_command
-import logging
-import re
 from pyrogram.enums.parse_mode import ParseMode
 
 
@@ -69,19 +68,22 @@ async def command_wiki(client: Client, message: Message) -> Message:
 
     inform = await message.reply_text('正在查询……', quote=False)
 
+    zh_wiki_url = f'https://zh.wikipedia.org/zh-cn/{query}'
+    en_wiki_url = f'https://en.wikipedia.org/wiki/{query}'
+
     zh_wiki, en_wiki = await asyncio.gather(
-        aget(f'https://zh.wikipedia.org/wiki/{query}'),
-        aget(f'https://en.wikipedia.org/wiki/{query}')
+        aget(zh_wiki_url),
+        aget(en_wiki_url)
     )
 
     if zh_wiki[1] == 200:
         return await inform.edit_text(
-            f'[zhwp]: <a href="https://zh.wikipedia.org/wiki/{query}">{query}</a>',
+            f'[zhwp]: <a href="{zh_wiki_url}">{query}</a>',
             parse_mode=ParseMode.HTML
         )
     if en_wiki[1] == 200:
         return await inform.edit_text(
-            f'[enwp]: <a href="https://en.wikipedia.org/wiki/{query}">{query}</a>',
+            f'[enwp]: <a href="{en_wiki_url}">{query}</a>',
             parse_mode=ParseMode.HTML
         )
 
