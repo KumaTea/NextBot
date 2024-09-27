@@ -5,6 +5,7 @@ import logging
 from pyrogram import Client
 from bs4 import BeautifulSoup
 from datetime import datetime
+from urllib.parse import quote
 from dataclasses import dataclass
 from pyrogram.types import Message
 from share.auth import ensure_auth
@@ -54,22 +55,23 @@ async def command_wiki(client: Client, message: Message) -> Message:
     if not query:
         return await message.reply_text('请输入要查询的关键字')
 
-    query = query.lower()
-    query = symbol_pattern.sub(' ', query)
+    kuma_query = symbol_pattern.sub(' ', query.lower())
+    kuma_quoted_query = kuma_query.replace(' ', '_')
 
     # wiki is fetched at start time
-    if query.lower() in KumaPedia.items:
+    if kuma_query in KumaPedia.items:
         # return await message.reply_text(f'\\[kuma]: [{query}](https://wiki.kmtea.eu/{query})', quote=False)
         return await message.reply_text(
-            f'[kuma]: <a href="https://wiki.kmtea.eu/{query}">{query}</a>',
+            f'[kuma]: <a href="https://wiki.kmtea.eu/{kuma_quoted_query}">{query}</a>',
             parse_mode=ParseMode.HTML,
             quote=False
         )
 
     inform = await message.reply_text('正在查询……', quote=False)
 
-    zh_wiki_url = f'https://zh.wikipedia.org/zh-cn/{query}'
-    en_wiki_url = f'https://en.wikipedia.org/wiki/{query}'
+    quoted_query = quote(query)
+    zh_wiki_url = f'https://zh.wikipedia.org/zh-cn/{quoted_query}'
+    en_wiki_url = f'https://en.wikipedia.org/wiki/{quoted_query}'
 
     zh_wiki, en_wiki = await asyncio.gather(
         aget(zh_wiki_url),
