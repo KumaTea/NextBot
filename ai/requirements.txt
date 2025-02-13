@@ -1,0 +1,9 @@
+# conda create -n ai python=3.12 pytorch torchvision torchaudio cpuonly transformers accelerate uvicorn starlette openai -c pytorch
+
+
+torch
+uvicorn
+starlette
+accelerate
+# apscheduler
+transformers
