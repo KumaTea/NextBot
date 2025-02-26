@@ -6,21 +6,26 @@ logging.info('Loading starlette')
 # https://huggingface.co/docs/transformers/en/pipeline_webserver
 
 from starlette.routing import Route
+from starlette.requests import Request
 from starlette.applications import Starlette
 from starlette.responses import JSONResponse
 
 
-async def get_status(request):
+async def get_status():
     return JSONResponse({'status': 'ok'})
 
 
-async def transcribe(request):
-    # payload = await request.body()
-    # string = payload.decode()
-    req_json = await request.json()
-    url = req_json.get('url')
-    file_path = req_json.get('file_path')
-    file_data = req_json.get('file_data')
+async def transcribe(request: Request):
+    if request.method == 'GET':
+        url = request.query_params.get('url')
+        file_path = request.query_params.get('file_path')
+        file_data = request.query_params.get('file_data')
+    else:  # POST
+        data = await request.json()  # or await request.form()
+        url = data.get('url')
+        file_path = data.get('file_path')
+        file_data = data.get('file_data')
+
     response_q = asyncio.Queue()
     await request.app.model_queue.put((url, file_path, file_data, response_q))
     output = await response_q.get()
@@ -36,8 +41,10 @@ async def server_loop(q):
 
 app = Starlette(
     routes=[
-        Route("/", get_status, methods=["GET"]),
-        Route("/GetStatus", get_status, methods=["GET"]),
+        Route('/', get_status, methods=['GET']),
+        Route('/getStatus', get_status, methods=['GET']),
+
+        Route('/transcribe', transcribe, methods=['GET', 'POST']),
     ],
 )
 

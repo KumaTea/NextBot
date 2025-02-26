@@ -60,9 +60,13 @@ model_storage = ModelStorage(whisper_model, whisper_processor, whisper_pipe)
 
 async def whisper_transcribe(url: str = '', file_path: str = '', file_data: bytes = b'') -> str:
     logging.info('Transcribing...')
-    t0 = time.time()
-    result = await model_storage.pipe(url or file_path or file_data)
-    t = time.time()
-    logging.info(f'Time: {t - t0:.3f}s\t' + 'Transcribed: ' + result['text'])
-    model_storage.run_at = datetime.now()
-    return result['text']
+    try:
+        model_storage.run_at = datetime.now()
+        t0 = time.time()
+        result = model_storage.pipe(url or file_path or file_data)
+        t = time.time()
+        logging.info(f'Time: {t - t0:.3f}s\t' + 'Transcribed: ' + result['text'])
+        return result['text']
+    except Exception as e:
+        logging.error(e)
+        return str(e)

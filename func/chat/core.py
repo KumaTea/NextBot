@@ -12,8 +12,8 @@ from gpt.data import thinking_emojis
 from gpt.core import stream_chat_by_sentences
 from pyrogram.enums.parse_mode import ParseMode
 from pyrogram.enums.chat_action import ChatAction
-from common.info import max_chunk, min_edit_interval
-from gpt.tools import gen_thread, gpt_to_bot, trim_starting_username
+from common.info import max_chunk, min_edit_interval, gpt_model, reasoning_model
+from gpt.tools import gen_thread, gpt_to_bot, trim_starting_username, get_cmd_type
 
 
 async def type_in_message(
@@ -32,8 +32,8 @@ async def type_in_message(
         chunk_len += len(chunk)
         if '`' in text:
             parse_mode = ParseMode.MARKDOWN
-        if text.lower().startswith('@chatgpt: '):
-            text = text[len('@chatgpt: '):]
+        if text.lower().startswith('@deepseek: '):
+            text = text[len('@deepseek: '):]
         if text.lower().startswith('/search'):
             is_search = True
         if not is_search and chunk_len > max_chunk and time() - last_edit > min_edit_interval:
@@ -95,4 +95,12 @@ async def chat_core(client: Client, message: Message, query_dialog: bool = True)
         await message.reply_chat_action(ChatAction.TYPING)
         dialog = [message]
         thread = gen_thread([message])
-    return await type_in_message(resp_message, stream_chat_by_sentences(thread), dialog)
+
+    model = gpt_model
+    first_msg_text = dialog[0].text
+    if first_msg_text:
+        command = get_cmd_type(first_msg_text)
+        if command == 'smart':
+            model = reasoning_model
+
+    return await type_in_message(resp_message, stream_chat_by_sentences(thread, model=model), dialog)

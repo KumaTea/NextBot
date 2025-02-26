@@ -89,6 +89,10 @@ def gpt_to_bot(text: str) -> str:
         if f'@{username}' in text:
             text = text.replace(f'@{username}', nicknames[username][0])
 
+    # think
+    text = text.replace('<think>', '```think')
+    text = text.replace('</think>', '```')
+
     return text
 
 
@@ -121,7 +125,7 @@ def gen_thread(dialogue: list[Message], custom_inst: str = None, search_result: 
         if first_msg_text:
             command = get_cmd_type(first_msg_text)
             if command == 'smart':
-                inst = {'role': 'system', 'content': f'{smart_inst} {search_inst}'}
+                inst = {'role': 'system', 'content': f'{smart_inst}'}  # {search_inst}'}
             elif command == 'debate':
                 inst = {'role': 'system', 'content': debate_inst}
     if not inst:
@@ -140,7 +144,7 @@ def gen_thread(dialogue: list[Message], custom_inst: str = None, search_result: 
             text = process_message(message) or ' '
             if message.from_user.id == self_id:
                 role = 'assistant'
-                username_string = '@ChatGPT: '
+                username_string = '@DeepSeek: '
             else:
                 role = 'user'
                 username_string = f'@{message.from_user.username or message.from_user.first_name}: '

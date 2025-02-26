@@ -11,7 +11,14 @@ async def exit_after_idle():
         await asyncio.sleep(to_sleep)
 
     logging.info('Idle time reached. Quitting...')
-    sys.exit(0)
+    try:
+        sys.exit(0)
+    except SystemExit:
+        import os
+        import signal
+        pid = os.getpid()
+        logging.info(f'Exiting with os.kill: {pid}')
+        os.kill(pid, signal.SIGINT)
 
 
 def create_idle_task():

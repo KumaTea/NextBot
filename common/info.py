@@ -1,6 +1,6 @@
 import os
 
-version = '3.2.0.432'
+version = '4.0.0.442'
 channel = 'local' if os.name == 'nt' else 'cloud'
 username = 'rbskbot'
 
@@ -16,4 +16,5 @@ max_chunk = 25  # characters
 min_edit_interval = 5  # seconds
 max_voice = 60  # seconds
 
-gpt_model = 'gpt-4o-mini'
+gpt_model = 'deepseek-r1:7b'
+reasoning_model = 'deepseek-r1:32b'

@@ -2,6 +2,7 @@
 
 
 torch
+aiohttp
 uvicorn
 starlette
 accelerate
