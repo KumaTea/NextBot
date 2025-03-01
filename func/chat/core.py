@@ -22,22 +22,31 @@ async def type_in_message(
         dialog: list[Message] = None
 ) -> Message:
     text = ''
-    parse_mode = None
+    edited_text = ''
     chunk_len = 0
     last_edit = time()
     is_search = False
     async for chunk in generator:
-        chunk = gpt_to_bot(trim_starting_username(chunk))
+        # chunk = gpt_to_bot(trim_starting_username(chunk))
+        # chunk may not present a full username, so we need to trim the whole text
         text += chunk
         chunk_len += len(chunk)
-        if '`' in text:
-            parse_mode = ParseMode.MARKDOWN
-        if text.lower().startswith('@deepseek: '):
-            text = text[len('@deepseek: '):]
+        # if '`' in text:
+        #     parse_mode = ParseMode.MARKDOWN
         if text.lower().startswith('/search'):
             is_search = True
+        # edited_text = text
+        # edited_text = gpt_to_bot(trim_starting_username(edited_text))
+        edited_text = gpt_to_bot(trim_starting_username(text))
+        # think
+        if '<think>' in text:
+            edited_text = edited_text.replace('<think>', '```think')
+            if '</think>' not in edited_text:
+                edited_text += '```'
+            else:
+                edited_text = edited_text.replace('</think>', '```')
         if not is_search and chunk_len > max_chunk and time() - last_edit > min_edit_interval:
-            message = await message.edit_text(text, parse_mode=parse_mode, disable_web_page_preview=True)
+            message = await message.edit_text(edited_text, disable_web_page_preview=True)
             chunk_len = 0
             last_edit = time()
     if is_search:
@@ -49,10 +58,11 @@ async def type_in_message(
         )
         return await re_ask_with_search_result(message, search_result, dialog)
     # last words
-    if not is_search and message.text.strip().lower()[-max_chunk:] != text.strip().lower()[-max_chunk:]:
+    if not is_search and message.text.strip().lower()[-max_chunk:] != edited_text.strip().lower()[-max_chunk:]:
         await asyncio.sleep(max(0, min_edit_interval - (time() - last_edit)))
-        message = await message.edit_text(text, parse_mode=parse_mode, disable_web_page_preview=True)
+        message = await message.edit_text(edited_text, disable_web_page_preview=True)
     msg_store.add(message)
+    msg_store.save()
     return message
 
 

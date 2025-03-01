@@ -89,10 +89,6 @@ def gpt_to_bot(text: str) -> str:
         if f'@{username}' in text:
             text = text.replace(f'@{username}', nicknames[username][0])
 
-    # think
-    text = text.replace('<think>', '```think')
-    text = text.replace('</think>', '```')
-
     return text
 
 
