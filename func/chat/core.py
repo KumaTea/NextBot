@@ -10,7 +10,7 @@ from typing import AsyncGenerator
 from pyrogram.types import Message
 from gpt.data import thinking_emojis
 from gpt.core import stream_chat_by_sentences
-from pyrogram.enums.parse_mode import ParseMode
+# from pyrogram.enums.parse_mode import ParseMode
 from pyrogram.enums.chat_action import ChatAction
 from common.info import max_chunk, min_edit_interval, gpt_model, reasoning_model
 from gpt.tools import gen_thread, gpt_to_bot, trim_starting_username, get_cmd_type
@@ -37,7 +37,7 @@ async def type_in_message(
             is_search = True
         # edited_text = text
         # edited_text = gpt_to_bot(trim_starting_username(edited_text))
-        edited_text = gpt_to_bot(trim_starting_username(text))
+        edited_text = gpt_to_bot(trim_starting_username(text.strip()))
         # think
         if '<think>' in text:
             edited_text = edited_text.replace('<think>', '```think')

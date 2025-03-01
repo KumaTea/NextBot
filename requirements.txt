@@ -2,7 +2,6 @@
 # conda
 aiohttp
 beautifulsoup4
-requests
 pyrogram
 uvloop; sys_platform != 'win32'
 

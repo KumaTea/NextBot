@@ -1,0 +1,14 @@
+[Unit]
+Description=Voice to Text Service
+After=network-online.target
+
+[Service]
+ExecStart=/home/kuma/.conda/envs/ai/bin/python3 /home/kuma/NextBot/ai/frontend.py
+User=kuma
+Group=kuma
+Restart=always
+RestartSec=3
+Environment="PATH=/home/kuma/.conda/envs/ai/bin:/opt/conda/condabin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin"
+
+[Install]
+WantedBy=default.target

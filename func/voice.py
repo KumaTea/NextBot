@@ -1,18 +1,16 @@
 import os
 import random
+import aiohttp
 import asyncio
 from common.info import max_voice
 from pyrogram.types import Message
 from gpt.data import thinking_emojis
-from bot.tools import retry_on_flood
-from common.data import TEMP_DIR, MEDIA_BOT_CMD
+from bot.tools import get_file_link
 
 
-TASK_FILE = f'{TEMP_DIR}/task.txt'
-STATUS_FILE = f'{TEMP_DIR}/media.run'
+TRANSCRIBE_API = 'http://10.3.3.6:12001/transcribe'
 
 
-@retry_on_flood(tries=2)
 async def react_voice(message: Message) -> Message:
     """
     Transcribe the voice message.
@@ -23,17 +21,15 @@ async def react_voice(message: Message) -> Message:
     if voice.duration > max_voice:
         return await message.reply_text(f'太长不听', quote=True)
 
-    inform = await message.reply_text(random.choice(thinking_emojis) + '👂', quote=True)
-    chat_id = message.chat.id
-    voice_id = message.id
-    inform_id = inform.id
+    # inform = await message.reply_text(random.choice(thinking_emojis) + '👂', quote=True)
+    # file_link = await get_file_link(voice.file_id)
+    inform, file_link = asyncio.gather(
+        message.reply_text(random.choice(thinking_emojis) + '👂', quote=True),
+        get_file_link(voice.file_id)
+    )
 
-    while os.path.isfile(STATUS_FILE):
-        await asyncio.sleep(1 + random.random())
+    async with aiohttp.ClientSession() as session:
+        async with session.get(f'{TRANSCRIBE_API}?url={file_link}') as resp:
+            text = await resp.text()
 
-    with open(TASK_FILE, 'a') as f:
-        # append task to file
-        f.write(','.join(list(map(str, ['voice', chat_id, voice_id, inform_id]))) + '\n')
-
-    await asyncio.create_subprocess_shell(MEDIA_BOT_CMD)
-    return inform
+    return await inform.edit_text(text)

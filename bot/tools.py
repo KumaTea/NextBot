@@ -1,12 +1,13 @@
 import uuid
 import random
+import aiohttp
 import asyncio
 from pyrogram import Client
 from typing import Callable
 from common.info import max_dialog
 from pyrogram.types import Message
 from pyrogram.errors import FloodWait
-from bot.session import bot, logging, msg_store
+from bot.session import bot, logging, msg_store, config
 
 
 async def get_message(chat_id: int, msg_id: int, client: Client = bot) -> Message:
@@ -69,3 +70,18 @@ def retry_on_flood(tries: int = 1):
             #     return None
         return wrapper
     return decorator
+
+
+async def get_file_link(file_id: str) -> str:
+    bot_token = config['tg']['bot_token']
+
+    tg_endpoint = f'https://api.telegram.org/bot{bot_token}'
+    get_file_url = f'{tg_endpoint}/getFile?file_id={file_id}'
+
+    async with aiohttp.ClientSession() as session:
+        async with session.get(get_file_url) as resp:
+            result = await resp.json()
+
+    file_path = result['result']['file_path']
+    file_link = f'https://api.telegram.org/file/bot{bot_token}/{file_path}'
+    return file_link
