@@ -1,4 +1,5 @@
 from v2t.base import *
+from v2t.media import download, is_video, extract_audio
 
 
 logging.info('Loading torch')
@@ -61,11 +62,29 @@ model_storage = ModelStorage(whisper_model, whisper_processor, whisper_pipe)
 async def whisper_transcribe(url: str = '', file_path: str = '', file_data: bytes = b'') -> str:
     logging.info('Transcribing...')
     try:
+        audio_path = None
+        video_path = None
         model_storage.run_at = datetime.now()
+        if url:
+            logging.info('Downloading...')
+            audio_path = await download(url)
+            logging.info('Downloaded: ' + audio_path)
+            file_path = audio_path
+            if await is_video(audio_path):
+                logging.info('Video detected, extracting audio...')
+                video_path = await extract_audio(file_path)
+                logging.info('Extracted: ' + file_path)
+                file_path = video_path
         t0 = time.time()
-        result = model_storage.pipe(url or file_path or file_data)
+        result = model_storage.pipe(file_data or file_path or url)
         t = time.time()
         logging.info(f'Time: {t - t0:.3f}s\t' + 'Transcribed: ' + result['text'])
+        if audio_path:
+            os.remove(audio_path)
+            logging.info('Deleted: ' + audio_path)
+        if video_path:
+            os.remove(video_path)
+            logging.info('Deleted: ' + video_path)
         return result['text']
     except Exception as e:
         logging.error(e)

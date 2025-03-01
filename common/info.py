@@ -14,7 +14,7 @@ gpt_admins = administrators
 max_dialog = 10  # conversations
 max_chunk = 25  # characters
 min_edit_interval = 5  # seconds
-max_voice = 60  # seconds
+max_voice_len = 60  # seconds
 
 gpt_model = 'deepseek-r1:7b'
 reasoning_model = 'deepseek-r1:32b'

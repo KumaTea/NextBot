@@ -51,7 +51,7 @@ async def process_msg(client: Client, message: Message) -> Optional[Message]:
             # logging.warning('========  END  ========')
             return None
 
-    if message.voice:
+    if message.voice or message.video_note:
         if (
             not message.forward_date  # not forwarded
             or message.forward_from  # forwarded, but can be checked
