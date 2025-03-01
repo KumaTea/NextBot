@@ -11,7 +11,7 @@ from starlette.applications import Starlette
 from starlette.responses import JSONResponse
 
 
-async def get_status():
+async def get_status(request):
     return JSONResponse({'status': 'ok'})
 
 

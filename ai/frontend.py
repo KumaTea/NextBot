@@ -30,7 +30,8 @@ async def wait_for_backend():
                 async with session.get(url) as resp:
                     if resp.status == 200:
                         return True
-        except TimeoutError:
+        # except TimeoutError:
+        except:
             pass
 
 
@@ -38,6 +39,8 @@ async def wait_for_backend():
 async def transcribe(request):
     await wait_for_backend()
     url = request.query.get('url')
+    if not url:
+        return web.Response(text='url parameter is required', status=400)
     async with aiohttp.ClientSession() as session:
         async with session.get(
             f'http://10.3.3.6:12000/transcribe?url={url}'
@@ -50,4 +53,4 @@ app.add_routes([web.get('/transcribe', transcribe)])
 
 
 if __name__ == '__main__':
-    web.run_app(app)
+    web.run_app(app, host='0.0.0.0', port=12001)
