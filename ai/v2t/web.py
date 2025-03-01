@@ -8,7 +8,7 @@ logging.info('Loading starlette')
 from starlette.routing import Route
 from starlette.requests import Request
 from starlette.applications import Starlette
-from starlette.responses import JSONResponse
+from starlette.responses import JSONResponse, PlainTextResponse
 
 
 async def get_status(request):
@@ -27,9 +27,10 @@ async def transcribe(request: Request):
         file_data = data.get('file_data')
 
     response_q = asyncio.Queue()
-    await request.app.model_queue.put((url, file_path, file_data, response_q))
+    await request.app.transcribe_queue.put((url, file_path, file_data, response_q))
     output = await response_q.get()
-    return JSONResponse(output)
+    # return JSONResponse(output)
+    return PlainTextResponse(output)
 
 
 async def server_loop(q):
@@ -51,6 +52,6 @@ app = Starlette(
 
 @app.on_event('startup')
 async def startup_event():
-    q = asyncio.Queue()
-    app.model_queue = q
-    asyncio.create_task(server_loop(q))
+    transcribe_queue = asyncio.Queue()
+    app.transcribe_queue = transcribe_queue
+    asyncio.create_task(server_loop(transcribe_queue))
