@@ -33,7 +33,7 @@ async def stream_chat_by_sentences(messages: list, model: str = gpt_model) -> As
     text = ''
     async for chunk in stream_chat(messages, model):
         text += chunk
-        if len(text) > 1 and any([text.endswith(i) for i in periods]):
+        if len(text) > 1 and any(text.endswith(i) for i in periods):
             yield text
             text = ''
     if text:
