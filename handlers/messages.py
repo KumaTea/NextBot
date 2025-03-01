@@ -1,4 +1,3 @@
-import asyncio
 from typing import Optional
 from pyrogram import Client
 from gpt.data import voice_tag

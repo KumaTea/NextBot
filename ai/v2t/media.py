@@ -17,11 +17,10 @@ async def download(url: str) -> str:
     async with aiohttp.ClientSession() as session:
         async with session.get(url) as resp:
             # get returned filename
-            if 'Content-Disposition' in resp.headers:
-                filename = os.path.join(
-                    TMP_PATH,
-                    str(uuid.uuid4()) + resp.headers['Content-Disposition'].split('filename=')[1].strip('"')
-                )
+            if '.' in url.split('/')[-1].split('?')[0]:
+                filename += '.' + url.split('/')[-1].split('?')[0].split('.')[-1]
+            elif 'Content-Disposition' in resp.headers and 'filename=' in resp.headers['Content-Disposition']:
+                filename += '.' + resp.headers['Content-Disposition'].split('filename=')[-1].split('"')[1].split('.')[-1]
             with open(filename, 'wb') as f:
                 while True:
                     chunk = await resp.content.read(1024)
@@ -41,7 +40,7 @@ async def is_video(video_path: str) -> bool:
 
 async def extract_audio(video_path: str) -> str:
     # extract audio from video and return path to audio file
-    audio_path = os.path.join(TMP_PATH, str(uuid.uuid4()))
+    audio_path = os.path.join(TMP_PATH, str(uuid.uuid4()) + '.m4a')
     cmd = f'{FFMPEG_BIN} -i {video_path} -vn -acodec copy {audio_path}'
     proc = await asyncio.create_subprocess_shell(cmd)
     await proc.communicate()
