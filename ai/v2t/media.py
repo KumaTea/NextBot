@@ -40,8 +40,8 @@ async def is_video(video_path: str) -> bool:
 
 async def extract_audio(video_path: str) -> str:
     # extract audio from video and return path to audio file
-    audio_path = os.path.join(TMP_PATH, str(uuid.uuid4()) + '.m4a')
-    cmd = f'{FFMPEG_BIN} -i {video_path} -vn -acodec copy {audio_path}'
+    audio_path = os.path.join(TMP_PATH, str(uuid.uuid4()) + '.aac')
+    cmd = f'{FFMPEG_BIN} -i {video_path} -vn -acodec aac -strict -2 {audio_path}'
     proc = await asyncio.create_subprocess_shell(cmd)
     await proc.communicate()
     return audio_path
