@@ -1,5 +1,5 @@
 from v2t.base import *
-from v2t.media import download, is_video, extract_audio
+from v2t.media import download, is_video, extract_audio, get_audio_length
 
 
 logging.info('Loading torch')
@@ -61,10 +61,14 @@ model_storage = ModelStorage(whisper_model, whisper_processor, whisper_pipe)
 
 async def whisper_transcribe(url: str = '', file_path: str = '', file_data: bytes = b'') -> str:
     logging.info('Transcribing...')
+
     try:
         audio_path = None
         video_path = None
         model_storage.run_at = datetime.now()
+
+
+        # ====== download ======
         if url:
             logging.info('Downloading...')
             audio_path = await download(url)
@@ -75,17 +79,34 @@ async def whisper_transcribe(url: str = '', file_path: str = '', file_data: byte
                 video_path = await extract_audio(file_path)
                 logging.info('Extracted: ' + file_path)
                 file_path = video_path
+
+        # ====== detect ======
+        audio_length = await get_audio_length(file_path)
+        is_long_audio = audio_length >= 30  # required by whisper turbo
+
+        # ====== transcribe ======
         t0 = time.time()
-        result = model_storage.pipe(file_data or file_path or url)
+        if is_long_audio:
+            result = model_storage.pipe(file_data or file_path or url, return_timestamps=True)
+        else:
+            result = model_storage.pipe(file_data or file_path or url)
         t = time.time()
         logging.info(f'Time: {t - t0:.3f}s\t' + 'Transcribed: ' + result['text'])
+
+        # ====== cleanup ======
         if audio_path:
             os.remove(audio_path)
             logging.info('Deleted: ' + audio_path)
         if video_path:
             os.remove(video_path)
             logging.info('Deleted: ' + video_path)
-        return result['text']
+
+        # ====== return ======
+        if is_long_audio:
+            text = '\n'.join(chunk['text'].strip() for chunk in result['chunks'] if chunk['text'].strip())
+        else:
+            text = result['text']
+        return text
     except Exception as e:
         logging.error(e)
         return str(e)

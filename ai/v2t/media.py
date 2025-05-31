@@ -45,3 +45,11 @@ async def extract_audio(video_path: str) -> str:
     proc = await asyncio.create_subprocess_shell(cmd)
     await proc.communicate()
     return audio_path
+
+
+async def get_audio_length(audio_path: str) -> int:
+    # get length of audio file in seconds
+    cmd = f'{FFPROBE_BIN} -v error -show_entries format=duration -of default=noprint_wrappers=1:nokey=1 {audio_path}'
+    proc = await asyncio.create_subprocess_shell(cmd, stdout=asyncio.subprocess.PIPE)
+    stdout, _ = await proc.communicate()
+    return int(float(stdout.decode().strip()))
