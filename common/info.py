@@ -1,6 +1,6 @@
 import os
 
-version = '4.1.1.455'
+version = '4.1.2.460'
 channel = 'local' if os.name == 'nt' else 'cloud'
 username = 'rbskbot'
 
@@ -16,5 +16,5 @@ max_chunk = 25  # characters
 min_edit_interval = 5  # seconds
 max_voice_len = 60  # seconds
 
-gpt_model = 'gemini-2.5-flash-preview-05-20'
+gpt_model = 'gemini-2.5-flash'
 reasoning_model = 'gemini-2.5-pro-preview-05-06'

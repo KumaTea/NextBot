@@ -16,5 +16,6 @@ def starting():
 
     register_handlers()
 
-    loop = asyncio.get_event_loop()
-    loop.run_until_complete(async_starting())
+    # temporarily skip fetching wiki
+    # loop = asyncio.get_event_loop()
+    # loop.run_until_complete(async_starting())

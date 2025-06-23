@@ -34,4 +34,9 @@ async def react_voice(message: Message) -> Message:
 
     if any(word in text for word in whisper_blacklist):
         return await inform.edit_text('听不懂捏')
-    return await inform.edit_text(f'{text.strip()} {voice_tag}')
+
+    if '\n' in text.strip():
+        seperator = '\n'
+    else:
+        seperator = ' '
+    return await inform.edit_text(f'{text.strip()}{seperator}{voice_tag}')
