@@ -13,7 +13,7 @@ from gpt.core import stream_chat_by_sentences
 # from pyrogram.enums.parse_mode import ParseMode
 from pyrogram.enums.chat_action import ChatAction
 from common.info import max_chunk, min_edit_interval, gpt_model, reasoning_model
-from gpt.tools import gen_thread, gpt_to_bot, trim_starting_username, get_cmd_type
+from gpt.tools import gen_thread, gpt_to_bot, trim_starting_username, get_cmd_type, trim_command
 
 
 async def type_in_message(
@@ -92,8 +92,10 @@ def no_input(message: Message) -> bool:
     return False
 
 
-async def chat_core(client: Client, message: Message, query_dialog: bool = True) -> Message:
-    resp_message = await message.reply_text(random.choice(thinking_emojis) + '❓')
+async def chat_core(client: Client, message: Message, query_dialog: bool = True, resp_text: str = '') -> Message:
+    if not resp_text:
+        resp_text = random.choice(thinking_emojis) + '❓'
+    resp_message = await message.reply_text(resp_text)
 
     if query_dialog:
         dialog, _ = await asyncio.gather(
@@ -114,3 +116,18 @@ async def chat_core(client: Client, message: Message, query_dialog: bool = True)
             model = reasoning_model
 
     return await type_in_message(resp_message, stream_chat_by_sentences(thread, model=model), dialog)
+
+
+async def get_last_n_messages(client: Client, message: Message, n: int) -> list[Message]:
+    this_msg_id = message.id
+    to_get_ids = [i for i in range(this_msg_id - n, this_msg_id)]
+
+    messages = await client.get_messages(message.chat.id, to_get_ids)
+    return messages
+
+
+def format_last_n_messages(this_message: Message, last_n_messages: list[Message]) -> Message:
+    last_n_messages_text = '\n'.join([m.text.strip() for m in last_n_messages if m.text.strip()])
+    this_message_command = this_message.text.split(' ')[0]
+    this_message.text = f'{this_message_command} {last_n_messages_text}'
+    return this_message

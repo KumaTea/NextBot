@@ -6,13 +6,13 @@ from pyrogram.types import Message
 from func.voice import react_voice
 from share.auth import ensure_auth
 from func.chat.core import chat_core
-from gpt.auth import ensure_gpt_auth
+# from gpt.auth import ensure_gpt_auth
 from common.data import gpt_auth_info
 from common.info import self_id, username
 
 
 # @ensure_auth has been decorated before this function is called
-@ensure_gpt_auth
+# @ensure_gpt_auth
 async def replied_chat(client: Client, message: Message) -> Optional[Message]:
     msg_store.add(message)
     return await chat_core(client, message)

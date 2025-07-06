@@ -1,13 +1,13 @@
 import asyncio
 from pyrogram import Client
 from typing import Optional
-from gpt.auth import gpt_auth
 from bot.session import msg_store
 from common.info import gpt_admins
 from share.auth import ensure_auth
-from gpt.auth import ensure_gpt_auth
-from func.chat.core import no_input, chat_core
+from gpt.tools import trim_command
+from gpt.auth import gpt_auth  # , ensure_gpt_auth
 from pyrogram.types import Message, CallbackQuery
+from func.chat.core import no_input, chat_core, get_last_n_messages, format_last_n_messages
 
 
 async def callback_gpt_auth(client: Client, callback_query: CallbackQuery) -> tuple:
@@ -35,20 +35,28 @@ async def gpt_callback_handler(client, callback_query):
         return await callback_gpt_auth(client, callback_query)
 
 
+# @ensure_gpt_auth
 @ensure_auth
-@ensure_gpt_auth
 async def command_chat(client: Client, message: Message) -> Optional[Message]:
     if no_input(message):
         command = message.text
         command_handle = command.split(' ')[0].split('@')[0].lower()
         return await message.reply_text(f'{command_handle} 不支持无输入调用。')
 
+    text = trim_command(message.text)
+    if text.isdigit() and 2 < int(text) < 99:
+        # get last n messages
+        last_n_messages = await get_last_n_messages(client, message, int(text))
+        message = format_last_n_messages(message, last_n_messages)
+        resp_text = f'正在读取之前的{text}条消息...'
+    else:
+        resp_text = ''
     msg_store.add(message)
-    return await chat_core(client, message)
+    return await chat_core(client, message, resp_text=resp_text)
 
 
+# @ensure_gpt_auth
 @ensure_auth
-@ensure_gpt_auth
 async def command_smart(client: Client, message: Message) -> Optional[Message]:
     if no_input(message):
         command = message.text
