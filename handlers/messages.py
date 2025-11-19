@@ -1,7 +1,6 @@
 from typing import Optional
 from pyrogram import Client
 from gpt.data import voice_tag
-from bot.session import msg_store
 from pyrogram.types import Message
 from func.voice import react_voice
 from share.auth import ensure_auth
@@ -9,6 +8,7 @@ from func.chat.core import chat_core
 # from gpt.auth import ensure_gpt_auth
 from common.data import gpt_auth_info
 from common.info import self_id, username
+from bot.session import msg_store, is_old_pyrogram
 
 
 # @ensure_auth has been decorated before this function is called
@@ -51,9 +51,15 @@ async def process_msg(client: Client, message: Message) -> Optional[Message]:
             return None
 
     if message.voice or message.video_note:
+        if is_old_pyrogram:
+            forward_from = message.forward_from
+            forward_date = message.forward_date
+        else:
+            forward_from = message.forward_origin.sender_user if message.forward_origin else None
+            forward_date = message.forward_origin.date if message.forward_origin else None
         if (
-            not message.forward_date  # not forwarded
-            or message.forward_from  # forwarded, but can be checked
+            not forward_date  # not forwarded
+            or forward_from  # forwarded, but can be checked
         ):
             # if forwarded by user with hidden identity, i.e. message.forward_date exists
             # then @ensure_auth cannot ensure both executor and original sender are authenticated
