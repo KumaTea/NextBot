@@ -1,10 +1,10 @@
 import random
 import aiohttp
 import asyncio
-from common.info import max_voice_len
 from pyrogram.types import Message
 from bot.tools import get_file_link
-from gpt.data import thinking_emojis, whisper_blacklist, voice_tag
+from common.info import max_voice_len
+from gpt.data import voice_tag, thinking_emojis, whisper_blacklist
 
 
 TRANSCRIBE_API = 'http://10.3.3.6:12001/transcribe'

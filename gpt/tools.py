@@ -6,7 +6,7 @@ from gpt.glossary import words, nicknames
 from pyrogram.parser.parser import Parser
 from common.info import self_id, max_dialog
 from common.data import cmd_re, bot_commands, start_user_re
-from gpt.data import assistant_username, gpt_inst, web_inst, smart_inst, debate_inst, search_inst, multiuser_inst
+from gpt.data import gpt_inst, web_inst, smart_inst, debate_inst, search_inst, multiuser_inst, assistant_username
 
 
 cmd_pattern = re.compile(cmd_re)

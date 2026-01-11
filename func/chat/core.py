@@ -3,17 +3,17 @@ import asyncio
 from time import time
 from pyrogram import Client
 from search.main import search
+from bot.session import logging
 from bot.tools import get_dialog
 from bot.session import msg_store
 from typing import AsyncGenerator
+from share.common import no_preview
 from gpt.data import thinking_emojis
 from gpt.core import stream_chat_by_sentences
-# from pyrogram.enums.parse_mode import ParseMode
-from bot.session import logging, is_old_pyrogram
 from pyrogram.enums.chat_action import ChatAction
 from pyrogram.types import Message, LinkPreviewOptions
-from common.info import max_chunk, min_edit_interval, gpt_model, reasoning_model
-from gpt.tools import gen_thread, gpt_to_bot, trim_starting_username, get_cmd_type, trim_command
+from common.info import max_chunk, gpt_model, reasoning_model, min_edit_interval
+from gpt.tools import gen_thread, gpt_to_bot, get_cmd_type, trim_command, trim_starting_username
 
 
 async def type_in_message(
@@ -32,6 +32,7 @@ async def type_in_message(
         text += chunk
         chunk_len += len(chunk)
         # if '`' in text:
+        # from pyrogram.enums.parse_mode import ParseMode
         #     parse_mode = ParseMode.MARKDOWN
         if text.lower().startswith('/search'):
             is_search = True
@@ -46,10 +47,7 @@ async def type_in_message(
             else:
                 edited_text = edited_text.replace('</think>', '```')
         if not is_search and chunk_len > max_chunk and time() - last_edit > min_edit_interval:
-            if is_old_pyrogram:
-                message = await message.edit_text(edited_text, disable_web_page_preview=True)
-            else:
-                message = await message.edit_text(edited_text, link_preview_options=LinkPreviewOptions(is_disabled=True))
+            message = await message.edit_text(edited_text, **no_preview)
             chunk_len = 0
             last_edit = time()
     if is_search:
@@ -63,10 +61,7 @@ async def type_in_message(
     # last words
     if not is_search and message.text.strip().lower()[-max_chunk:] != edited_text.strip().lower()[-max_chunk:]:
         await asyncio.sleep(max(0, min_edit_interval - (time() - last_edit)))
-        if is_old_pyrogram:
-            message = await message.edit_text(edited_text, disable_web_page_preview=True)
-        else:
-            message = await message.edit_text(edited_text, link_preview_options=LinkPreviewOptions(is_disabled=True))
+        message = await message.edit_text(edited_text, **no_preview)
     msg_store.add(message)
     msg_store.save()
     return message

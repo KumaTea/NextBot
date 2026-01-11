@@ -2,10 +2,9 @@ import os
 from typing import Optional
 from pyrogram import Client
 from common.info import gpt_admins
+from pyrogram.types import Message
+from share.common import no_preview
 from share.local import trusted_group
-from bot.session import is_old_pyrogram
-from pyrogram.enums.parse_mode import ParseMode
-from pyrogram.types import Message, LinkPreviewOptions
 from common.data import gpt_auth_info, bot_debug_info, gpt_users_file
 from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 
@@ -55,14 +54,7 @@ def has_gpt_auth(client: Client, message: Message) -> bool:
 async def ask_for_gpt_auth(client: Client, message: Message) -> Optional[Message]:
     if os.name == 'nt':
         # debugging
-        if is_old_pyrogram:
-            return await message.reply_text(bot_debug_info, parse_mode=ParseMode.MARKDOWN, disable_web_page_preview=True)
-        else:
-            return await message.reply_text(
-                bot_debug_info,
-                parse_mode=ParseMode.MARKDOWN,
-                link_preview_options=LinkPreviewOptions(is_disabled=True)
-            )
+        return await message.reply_text(bot_debug_info, **no_preview)
     else:
         user_id = message.from_user.id
         reply_markup = InlineKeyboardMarkup([

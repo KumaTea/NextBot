@@ -1,11 +1,11 @@
 import asyncio
 from pyrogram import Client
 from typing import Optional
+from gpt.auth import gpt_auth  # , ensure_gpt_auth
 from bot.session import msg_store
 from common.info import gpt_admins
 from share.auth import ensure_auth
 from gpt.tools import trim_command
-from gpt.auth import gpt_auth  # , ensure_gpt_auth
 from pyrogram.types import Message, CallbackQuery
 from func.chat.core import no_input, chat_core, get_last_n_messages, format_last_n_messages
 

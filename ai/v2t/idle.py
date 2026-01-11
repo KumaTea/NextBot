@@ -2,7 +2,7 @@ from v2t.base import *
 from v2t.whisper import model_storage
 
 
-IDLE_SECONDS = 60 * 5  # 5 minutes
+IDLE_SECONDS = 60 * 10  # minutes
 
 
 async def exit_after_idle():

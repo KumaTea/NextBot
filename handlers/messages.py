@@ -1,14 +1,15 @@
 from typing import Optional
 from pyrogram import Client
 from gpt.data import voice_tag
+from bot.session import msg_store
 from pyrogram.types import Message
 from func.voice import react_voice
 from share.auth import ensure_auth
 from func.chat.core import chat_core
 # from gpt.auth import ensure_gpt_auth
 from common.data import gpt_auth_info
+from share.common import is_old_pyrogram
 from common.info import self_id, username
-from bot.session import msg_store, is_old_pyrogram
 
 
 # @ensure_auth has been decorated before this function is called
