@@ -2,18 +2,16 @@ import random
 import asyncio
 from time import time
 from pyrogram import Client
-from search.main import search
-from bot.session import logging
 from bot.tools import get_dialog
 from bot.session import msg_store
 from typing import AsyncGenerator
+from pyrogram.types import Message
 from share.common import no_preview
 from gpt.data import thinking_emojis
 from gpt.core import stream_chat_by_sentences
 from pyrogram.enums.chat_action import ChatAction
-from pyrogram.types import Message, LinkPreviewOptions
 from common.info import max_chunk, gpt_model, reasoning_model, min_edit_interval
-from gpt.tools import gen_thread, gpt_to_bot, get_cmd_type, trim_command, trim_starting_username
+from gpt.tools import gen_thread, gpt_to_bot, get_cmd_type, trim_starting_username
 
 
 async def type_in_message(
@@ -25,19 +23,43 @@ async def type_in_message(
     edited_text = ''
     chunk_len = 0
     last_edit = time()
-    is_search = False
     async for chunk in generator:
-        # chunk = gpt_to_bot(trim_starting_username(chunk))
-        # chunk may not present a full username, so we need to trim the whole text
         text += chunk
         chunk_len += len(chunk)
-        # if '`' in text:
-        # from pyrogram.enums.parse_mode import ParseMode
-        #     parse_mode = ParseMode.MARKDOWN
-        if text.lower().startswith('/search'):
-            is_search = True
-        # edited_text = text
-        # edited_text = gpt_to_bot(trim_starting_username(edited_text))
+
+        # Check for |SEP| token to split into multiple messages
+        if '|SEP|' in text:
+            sep_index = text.index('|SEP|')
+            current_text = text[:sep_index]
+            remaining_text = text[sep_index + len('|SEP|'):]
+
+            # Finalize current message with content before |SEP|
+            edited_text = gpt_to_bot(trim_starting_username(current_text.strip()))
+            # Apply think tag formatting
+            if '<think>' in current_text:
+                edited_text = edited_text.replace('<think>', '```think')
+                if '</think>' not in edited_text:
+                    edited_text += '```'
+                else:
+                    edited_text = edited_text.replace('</think>', '```')
+
+            await asyncio.sleep(max(0, min_edit_interval - (time() - last_edit)))
+            message = await message.edit_text(edited_text, **no_preview)
+            msg_store.add(message)
+            msg_store.save()
+
+            # Create a new message with remaining content
+            new_message = await message.reply_text(remaining_text)
+
+            # Create a generator that yields the remaining text
+            async def remaining_generator():
+                yield remaining_text
+                async for _chunk in generator:
+                    yield _chunk
+
+            # Recursively call type_in_message with remaining content
+            return await type_in_message(new_message, remaining_generator(), dialog)
+
         edited_text = gpt_to_bot(trim_starting_username(text.strip()))
         # think
         if '<think>' in text:
@@ -46,40 +68,19 @@ async def type_in_message(
                 edited_text += '```'
             else:
                 edited_text = edited_text.replace('</think>', '```')
-        if not is_search and chunk_len > max_chunk and time() - last_edit > min_edit_interval:
+        if chunk_len > max_chunk and time() - last_edit > min_edit_interval:
             message = await message.edit_text(edited_text, **no_preview)
             chunk_len = 0
             last_edit = time()
-    if is_search:
-        logging.info(f'GPT has requested: {text}')
-        # search_result = await get_search_result(text)
-        search_result, message = await asyncio.gather(
-            get_search_result(text),
-            message.edit_text('进行一个索的搜……')
-        )
-        return await re_ask_with_search_result(message, search_result, dialog)
+
     # last words
-    if not is_search and message.text.strip().lower()[-max_chunk:] != edited_text.strip().lower()[-max_chunk:]:
+    if message.text.strip().lower()[-max_chunk:] != edited_text.strip().lower()[-max_chunk:]:
         await asyncio.sleep(max(0, min_edit_interval - (time() - last_edit)))
         message = await message.edit_text(edited_text, **no_preview)
     msg_store.add(message)
     msg_store.save()
     return message
 
-
-async def re_ask_with_search_result(
-        message: Message,
-        search_result: str,
-        dialog: list[Message]
-) -> Message:
-    thread = gen_thread(dialog, search_result=search_result)
-    return await type_in_message(message, stream_chat_by_sentences(thread), dialog)
-
-
-async def get_search_result(text: str) -> str:
-    # text.lower().startswith('/search')
-    query = text[len('/search'):].strip()
-    return await search(query)
 
 
 def no_input(message: Message) -> bool:
@@ -116,7 +117,10 @@ async def chat_core(client: Client, message: Message, query_dialog: bool = True,
         if command == 'smart':
             model = reasoning_model
 
-    return await type_in_message(resp_message, stream_chat_by_sentences(thread, model=model), dialog)
+    try:
+        return await type_in_message(resp_message, stream_chat_by_sentences(thread, model=model), dialog)
+    except Exception as e:
+        return await resp_message.edit_text(f'发生错误: {e}')
 
 
 async def get_last_n_messages(client: Client, message: Message, n: int) -> list[Message]:

@@ -1,6 +1,6 @@
 import os
 
-version = '4.1.3.480'
+version = '4.2.3.496'
 channel = 'local' if os.name == 'nt' else 'cloud'
 username = 'rbskbot'
 
@@ -16,5 +16,5 @@ max_chunk = 25  # characters
 min_edit_interval = 5  # seconds
 max_voice_len = 60  # seconds
 
-gpt_model = 'gemini-2.5-flash'
-reasoning_model = 'gemini-2.5-pro'
+gpt_model = 'gemini-3.1-flash-lite-preview'
+reasoning_model = 'gemini-3.1-flash-lite-preview'  # gemini-3-pro-preview has no free tier

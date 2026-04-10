@@ -6,7 +6,7 @@ from gpt.glossary import words, nicknames
 from pyrogram.parser.parser import Parser
 from common.info import self_id, max_dialog
 from common.data import cmd_re, bot_commands, start_user_re
-from gpt.data import gpt_inst, web_inst, smart_inst, debate_inst, search_inst, multiuser_inst, assistant_username
+from gpt.data import gpt_inst, smart_inst, debate_inst, multiuser_inst, assistant_username
 
 
 cmd_pattern = re.compile(cmd_re)
@@ -100,7 +100,7 @@ def get_cmd_type(text: str) -> str:
     return 'chat'
 
 
-def gen_thread(dialogue: list[Message], custom_inst: str = None, search_result: str = None) -> list[dict]:
+def gen_thread(dialogue: list[Message], custom_inst: str = None) -> list[dict]:
     # detect multiuser
     multiuser = False
     for m in dialogue.copy():
@@ -114,18 +114,15 @@ def gen_thread(dialogue: list[Message], custom_inst: str = None, search_result: 
     inst = {}
     if custom_inst:
         inst = {'role': 'system', 'content': custom_inst}
-    elif search_result:
-        inst = {'role': 'system', 'content': f'{gpt_inst} {web_inst}'}
     else:
         first_msg_text = dialogue[0].text
         if first_msg_text:
             command = get_cmd_type(first_msg_text)
             if command == 'smart':
-                inst = {'role': 'system', 'content': f'{smart_inst}'}  # {search_inst}'}
+                inst = {'role': 'system', 'content': f'{smart_inst}'}
             elif command == 'debate':
                 inst = {'role': 'system', 'content': debate_inst}
     if not inst:
-        # inst = {'role': 'system', 'content': f'{gpt_inst} {search_inst}'}
         inst = {'role': 'system', 'content': f'{gpt_inst}'}
     if multiuser:
         inst['content'] += ' ' + multiuser_inst
@@ -152,11 +149,6 @@ def gen_thread(dialogue: list[Message], custom_inst: str = None, search_result: 
         logging.info(f'[func_chat]\t' + m['role'] + ': ' + m['content'])
     dialog_thread = dialog_thread[-max_dialog:]
     thread.extend(dialog_thread)
-
-    # add search result
-    if search_result:
-        search_result_text = 'Web Search Result:\n' + search_result
-        thread.append({'role': 'system', 'content': search_result_text})
 
     logging.info(pprint.pformat(thread, indent=2))
     return thread
