@@ -1,24 +1,17 @@
 # common
-# conda
 aiohttp
 beautifulsoup4
-pyrogram
+requests
 uvloop; sys_platform != 'win32'
 
-# openai
-# conda
+# telegram
+telethon
+# optional, but a large speed-up for MTProto crypto:
+cryptg
+
+# X mirror -- a maintained fork of twikit; imports as `twikit`.
+# The bot still starts (with the mirror disabled) if this is missing.
+twifork
+
+# gemini, via the openai-compatible endpoint
 openai>=1.0.0
-
-# google
-# conda
-# google-auth
-# google-api-core
-# colorama
-# grpcio-status
-# proto-plus
-
-# pip
-# google-generativeai
-
-# conda
-# nomkl

@@ -1,12 +1,11 @@
 import os
 from typing import Optional
-from pyrogram import Client
+from telethon import Button
 from common.info import gpt_admins
-from pyrogram.types import Message
 from share.common import no_preview
 from share.local import trusted_group
+from telethon.tl.custom import Message
 from common.data import gpt_auth_info, bot_debug_info, gpt_users_file
-from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 
 
 class GPTAuth:
@@ -40,35 +39,28 @@ class GPTAuth:
 gpt_auth = GPTAuth()
 
 
-def has_gpt_auth(client: Client, message: Message) -> bool:
-    if message.from_user:
-        chat_id = message.chat.id
-        if chat_id in trusted_group:
-            return True
-        user_id = message.from_user.id
-        if user_id in gpt_auth.users:
-            return True
-    return False
+def has_gpt_auth(event) -> bool:
+    if event.chat_id in trusted_group:
+        return True
+    return bool(event.sender_id) and event.sender_id in gpt_auth.users
 
 
-async def ask_for_gpt_auth(client: Client, message: Message) -> Optional[Message]:
+async def ask_for_gpt_auth(event) -> Optional[Message]:
     if os.name == 'nt':
         # debugging
-        return await message.reply_text(bot_debug_info, **no_preview)
-    else:
-        user_id = message.from_user.id
-        reply_markup = InlineKeyboardMarkup([
-            [InlineKeyboardButton('允许', callback_data=f'gpt_auth_{user_id}_y')],
-            [InlineKeyboardButton('拒绝', callback_data=f'gpt_auth_{user_id}_n')]
-        ])
-        return await message.reply_text(gpt_auth_info, reply_markup=reply_markup)
+        return await event.reply(bot_debug_info, **no_preview)
+
+    user_id = event.sender_id
+    return await event.reply(gpt_auth_info, buttons=[
+        [Button.inline('允许', f'gpt_auth_{user_id}_y'.encode())],
+        [Button.inline('拒绝', f'gpt_auth_{user_id}_n'.encode())]
+    ])
 
 
 def ensure_gpt_auth(func):
-    async def wrapper(client: Client, message: Message):
-        if has_gpt_auth(client, message):
-            return await func(client, message)
-        else:
-            # return await ask_for_gpt_auth(client, message)
-            return None
+    async def wrapper(event):
+        if has_gpt_auth(event):
+            return await func(event)
+        # return await ask_for_gpt_auth(event)
+        return None
     return wrapper

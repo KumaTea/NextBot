@@ -1,10 +1,10 @@
 import re
-import pprint
 from bot.session import logging
-from pyrogram.types import Message
+from telethon.tl.custom import Message
 from gpt.glossary import words, nicknames
-from pyrogram.parser.parser import Parser
-from common.info import self_id, max_dialog
+from telethon.extensions import markdown
+from common import info
+from common.info import max_dialog
 from common.data import cmd_re, bot_commands, start_user_re
 from gpt.data import gpt_inst, smart_inst, debate_inst, multiuser_inst, assistant_username
 
@@ -45,23 +45,13 @@ def trim_starting_username(text: str) -> str:
 
 
 def unparse_markdown(message: Message) -> str:
-    p = Parser(client=None)
-    result = p.unparse(
-        text=message.text,
-        entities=message.entities,
-        is_html=False
-    )
-    return result
+    """Plain text with its entities written back as markdown."""
+    return markdown.unparse(message.message, message.entities)
 
 
 def process_message(message: Message) -> str:
-    if message.entities:
-        text = unparse_markdown(message)
-    else:
-        text = message.text
-    text = trim_command(text)
-    # text = trim_starting_username(text)
-    return text
+    text = unparse_markdown(message) if message.entities else message.raw_text
+    return trim_command(text or '')
 
 
 def bot_to_gpt(text: str) -> str:
@@ -100,22 +90,32 @@ def get_cmd_type(text: str) -> str:
     return 'chat'
 
 
+def speaker_name(message: Message) -> str:
+    """How to address whoever wrote a message in the GPT thread."""
+    sender = message.sender
+    if sender:
+        return sender.username or sender.first_name or str(message.sender_id)
+    return str(message.sender_id)
+
+
 def gen_thread(dialogue: list[Message], custom_inst: str = None) -> list[dict]:
+    # only keep messages sent by an actual user
+    dialogue = [m for m in dialogue if m and m.sender_id and m.sender_id > 0]
+    if not dialogue:
+        return []
+    # only the last few turns are sent, so do not spend work rendering the rest
+    dialogue = dialogue[-max_dialog:]
+
     # detect multiuser
-    multiuser = False
-    for m in dialogue.copy():
-        if not m.from_user:
-            dialogue.remove(m)
-    user_ids = list(set([m.from_user.id for m in dialogue] + [self_id]))
-    if len(user_ids) > 2:
-        multiuser = True
+    user_ids = set(m.sender_id for m in dialogue) | {info.self_id}
+    multiuser = len(user_ids) > 2
 
     # generate instructions
     inst = {}
     if custom_inst:
         inst = {'role': 'system', 'content': custom_inst}
     else:
-        first_msg_text = dialogue[0].text
+        first_msg_text = dialogue[0].raw_text
         if first_msg_text:
             command = get_cmd_type(first_msg_text)
             if command == 'smart':
@@ -133,22 +133,21 @@ def gen_thread(dialogue: list[Message], custom_inst: str = None) -> list[dict]:
 
     # generate dialog thread
     for message in dialogue:
-        if message.text:
-            text = process_message(message) or ' '
-            if message.from_user.id == self_id:
-                role = 'assistant'
-                username_string = f'{assistant_username}: '
-            else:
-                role = 'user'
-                username_string = f'@{message.from_user.username or message.from_user.first_name}: '
-            if multiuser:
-                dialog_thread.append({'role': role, 'content': username_string + bot_to_gpt(text)})
-            else:
-                dialog_thread.append({'role': role, 'content': f'{bot_to_gpt(text)}'})
-    for m in dialog_thread:
-        logging.info(f'[func_chat]\t' + m['role'] + ': ' + m['content'])
-    dialog_thread = dialog_thread[-max_dialog:]
+        if not message.raw_text:
+            continue
+        text = process_message(message) or ' '
+        if message.sender_id == info.self_id:
+            role = 'assistant'
+            username_string = f'{assistant_username}: '
+        else:
+            role = 'user'
+            username_string = f'@{speaker_name(message)}: '
+        content = username_string + bot_to_gpt(text) if multiuser else bot_to_gpt(text)
+        dialog_thread.append({'role': role, 'content': content})
     thread.extend(dialog_thread)
 
-    logging.info(pprint.pformat(thread, indent=2))
+    # logged once -- this used to print every message and then the whole
+    # thread again as a pretty-printed block
+    for m in thread:
+        logging.info(f"[func_chat]\t{m['role']}: {m['content'][:200]}")
     return thread

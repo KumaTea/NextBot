@@ -1,43 +1,29 @@
-import os
-import asyncio
-from pyrogram import Client
-from pyrogram.types import Message
 from share.auth import ensure_auth
-from common.data import TEMP_DIR, MEDIA_BOT_CMD
-from pyrogram.enums.parse_mode import ParseMode
+from func.media_task import queue
+from telethon.tl.custom import Message
 
 
 MODELS = {'blip', 'git'}
-TASK_FILE = f'{TEMP_DIR}/task.txt'
-STATUS_FILE = f'{TEMP_DIR}/media.run'
 
 
 @ensure_auth
-async def command_cap(client: Client, message: Message) -> Message:
-    reply = message.reply_to_message
+async def command_cap(event) -> Message:
+    reply = await event.get_reply_message()
     if not (reply and reply.photo):
-        return await message.reply_text('请回复一张图片。', quote=False)
+        return await event.respond('请回复一张图片。')
 
-    text = message.text
+    text = event.raw_text
     model = 'blip'
     inform_text = '正在识别中，请稍候。本功能运行在性能孱弱的路由器上，请耐心等待。'
     if len(text.split()) > 1:
-        arg = text.split()[1]
-        if arg.lower() in MODELS:
-            model = arg.lower()
+        arg = text.split()[1].lower()
+        if arg in MODELS:
+            model = arg
             inform_text += f'\n使用模型 `{model}`。'
         else:
             inform_text += f'\n未知的语言参数(`{MODELS=}`)，使用默认值 `{model}`。'
 
-    inform = await message.reply_text(inform_text, quote=False, parse_mode=ParseMode.MARKDOWN)
-    chat_id = message.chat.id
-    reply_id = reply.id
-    inform_id = inform.id
-    with open(TASK_FILE, 'a') as f:
-        # append task to file
-        f.write(','.join(list(map(str, ['cap', chat_id, reply_id, inform_id, model]))) + '\n')
-
-    while os.path.isfile(STATUS_FILE):
-        await asyncio.sleep(1)
-    await asyncio.create_subprocess_shell(MEDIA_BOT_CMD)
+    inform = await event.respond(inform_text)
+    if not await queue('cap', event.chat_id, reply.id, inform.id, model):
+        return await inform.edit('识别服务没有响应，请稍后再试。')
     return inform

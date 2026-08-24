@@ -1,10 +1,19 @@
-from pyrogram import Client
-from pyrogram.types import CallbackQuery
+import logging
+from x.sync import on_callback as x_callback
 from func.chat.cmd import gpt_callback_handler
 
 
-async def process_callback(client: Client, callback_query: CallbackQuery):
-    task = callback_query.data.split('_')[0]
+async def process_callback(event):
+    # Telethon hands callback data over as bytes, and there is no promise the
+    # bytes are ours -- an old button from a previous build still arrives here.
+    try:
+        task = event.data.decode().split('_')[0]
+    except (AttributeError, UnicodeDecodeError):
+        logging.warning(f'[callbacks]\tUndecodable callback data: {event.data!r}')
+        return await event.answer('未知任务', alert=True)
+
     if task == 'gpt':
-        return await gpt_callback_handler(client, callback_query)
-    return await callback_query.answer('未知任务', show_alert=True)
+        return await gpt_callback_handler(event)
+    if task == 'x':
+        return await x_callback(event)
+    return await event.answer('未知任务', alert=True)

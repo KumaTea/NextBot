@@ -2,15 +2,13 @@ import re
 import asyncio
 import aiohttp
 import logging
-from pyrogram import Client
 from bs4 import BeautifulSoup
 from datetime import datetime
 from urllib.parse import quote
 from dataclasses import dataclass
-from pyrogram.types import Message
 from share.auth import ensure_auth
 from gpt.tools import trim_command
-from pyrogram.enums.parse_mode import ParseMode
+from telethon.tl.custom import Message
 
 
 @dataclass
@@ -22,7 +20,7 @@ class Wiki:
 KumaPedia = Wiki([], datetime.now())
 SITEMAP_URL = 'https://wiki.kmtea.eu/start?do=index'
 
-symbol_pattern = re.compile(r'[!@#$%^&*()_+={}\[\]:;"\'<>,.?/\\|`~]')
+symbol_pattern = re.compile(r'[!@#$%^&*()_+={}\[\]:;"\'<>,.?/\|`~]')
 
 
 async def aget(url: str) -> tuple[str, int]:
@@ -37,8 +35,7 @@ async def fetch_wiki():
     # find all <a> tags with class="wikilink1" and extract the title
     soup = BeautifulSoup(html, 'html.parser')
     items = [a['title'] for a in soup.find_all('a', class_='wikilink1')]
-    items = [item.lower() for item in items]
-    items = [item.replace('_', ' ') for item in items]
+    items = [item.lower().replace('_', ' ') for item in items]
     items = list(set(items))
 
     KumaPedia.items = items
@@ -49,25 +46,22 @@ async def fetch_wiki():
 
 
 @ensure_auth
-async def command_wiki(client: Client, message: Message) -> Message:
-    text = message.text
-    query = trim_command(text)
+async def command_wiki(event) -> Message:
+    query = trim_command(event.raw_text or '')
     if not query:
-        return await message.reply_text('请输入要查询的关键字')
+        return await event.reply('请输入要查询的关键字')
 
     kuma_query = symbol_pattern.sub(' ', query.lower())
     kuma_quoted_query = kuma_query.replace(' ', '_')
 
     # wiki is fetched at start time
     if kuma_query in KumaPedia.items:
-        # return await message.reply_text(f'\\[kuma]: [{query}](https://wiki.kmtea.eu/{query})', quote=False)
-        return await message.reply_text(
+        return await event.respond(
             f'[kuma]: <a href="https://wiki.kmtea.eu/{kuma_quoted_query}">{query}</a>',
-            parse_mode=ParseMode.HTML,
-            quote=False
+            parse_mode='html'
         )
 
-    inform = await message.reply_text('正在查询……', quote=False)
+    inform = await event.respond('正在查询……')
 
     quoted_query = quote(query)
     zh_wiki_url = f'https://zh.wikipedia.org/zh-cn/{quoted_query}'
@@ -79,14 +73,14 @@ async def command_wiki(client: Client, message: Message) -> Message:
     )
 
     if zh_wiki[1] == 200:
-        return await inform.edit_text(
+        return await inform.edit(
             f'[zhwp]: <a href="{zh_wiki_url}">{query}</a>',
-            parse_mode=ParseMode.HTML
+            parse_mode='html'
         )
     if en_wiki[1] == 200:
-        return await inform.edit_text(
+        return await inform.edit(
             f'[enwp]: <a href="{en_wiki_url}">{query}</a>',
-            parse_mode=ParseMode.HTML
+            parse_mode='html'
         )
 
-    return await inform.edit_text('未找到相关条目 😢')
+    return await inform.edit('未找到相关条目 😢')

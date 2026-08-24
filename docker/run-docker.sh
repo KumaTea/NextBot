@@ -1,17 +1,16 @@
-#!/usr/bin/env bash
+#!/bin/sh
 
 set -ex
 
-#rm -f /tmp/rbsk.log || true
-#touch /tmp/rbsk.log
-#rm -f /tmp/media.log || true
-#touch /tmp/media.log
-
 cd /home/kuma/bots/rbsk
-# /opt/conda/envs/rbsk/bin/python3 main.py 2>&1 | tee -a /tmp/rbsk.log
-# python3 main.py >> /tmp/rbsk.log  2>&1 &
-python3 main.py
-# sleep 1
-# /opt/conda/envs/rbsk/bin/python3 mediabot.py >> /tmp/media.log 2>&1 &
-# tail -f /tmp/rbsk.log /tmp/media.log
-# exit 0
+
+# The conda-based image (docker/Dockerfile) keeps its interpreter in an env;
+# the alpine image (docker/alpine.Dockerfile) uses the system one. Pick
+# whichever is actually present rather than assuming either.
+if [ -x /opt/conda/envs/rbsk/bin/python3 ]; then
+    PYTHON=/opt/conda/envs/rbsk/bin/python3
+else
+    PYTHON=python3
+fi
+
+exec "$PYTHON" main.py

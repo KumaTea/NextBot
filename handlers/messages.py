@@ -1,73 +1,59 @@
 from typing import Optional
-from pyrogram import Client
 from gpt.data import voice_tag
 from bot.session import msg_store
-from pyrogram.types import Message
 from func.voice import react_voice
 from share.auth import ensure_auth
 from func.chat.core import chat_core
 # from gpt.auth import ensure_gpt_auth
 from common.data import gpt_auth_info
-from share.common import is_old_pyrogram
-from common.info import self_id, username
+from telethon.tl.custom import Message
+from common import info
+from common.info import username
 
 
 # @ensure_auth has been decorated before this function is called
 # @ensure_gpt_auth
-async def replied_chat(client: Client, message: Message) -> Optional[Message]:
-    msg_store.add(message)
-    return await chat_core(client, message)
+async def replied_chat(event) -> Optional[Message]:
+    msg_store.add(event.message)
+    return await chat_core(event.client, event.message)
 
 
 @ensure_auth
-async def process_msg(client: Client, message: Message) -> Optional[Message]:
-    if message.from_user:
-        user_id = message.from_user.id
-        if user_id == self_id:
-            return None
+async def process_msg(event) -> Optional[Message]:
+    if event.sender_id == info.self_id:
+        return None
 
-    text = message.text
-    reply = message.reply_to_message
+    message = event.message
+    text = message.raw_text
     if text:
         if text.startswith('/'):
             return None
 
-        try:
-            if reply and reply.from_user.id == self_id:
-                if voice_tag in reply.text:
-                    return None
-                elif gpt_auth_info == reply.text:
-                    return None
-                else:
-                    return await replied_chat(client, message)
-            elif text.startswith(f'@{username}') or text.endswith(f'@{username}'):
-                # mentioning me
-                message.text = text.replace(f'@{username}', '').strip()
-                return await replied_chat(client, message)
-        except AttributeError:
-            # logging.warning('======== ERROR ========')
-            # logging.warning('[messages]\tAttributeError')
-            # logging.warning(f'{message=}')
-            # logging.warning('========  END  ========')
-            return None
+        reply = await message.get_reply_message()
+        if reply and reply.sender_id == info.self_id:
+            reply_text = reply.raw_text or ''
+            if voice_tag in reply_text:
+                return None
+            if gpt_auth_info == reply_text:
+                return None
+            return await replied_chat(event)
+        if text.startswith(f'@{username}') or text.endswith(f'@{username}'):
+            # mentioning me
+            # drop the mention; the old entity offsets no longer line up
+            message.message = text.replace(f'@{username}', '').strip()
+            message.entities = None
+            return await replied_chat(event)
 
-    if message.voice or message.video_note:
-        if is_old_pyrogram:
-            forward_from = message.forward_from
-            forward_date = message.forward_date
-        else:
-            forward_from = message.forward_origin.sender_user if message.forward_origin else None
-            forward_date = message.forward_origin.date if message.forward_origin else None
+    media = message.voice or message.video_note
+    if media:
+        forward = message.forward
         if (
-            not forward_date  # not forwarded
-            or forward_from  # forwarded, but can be checked
+            not forward  # not forwarded
+            or forward.sender_id  # forwarded, but can be checked
         ):
-            # if forwarded by user with hidden identity, i.e. message.forward_date exists
-            # then @ensure_auth cannot ensure both executor and original sender are authenticated
+            # if forwarded by a user with hidden identity, i.e. message.forward exists
+            # but carries no sender, then @ensure_auth cannot ensure both executor and
+            # original sender are authenticated
             # otherwise (not fw or fw and checked) the message is safe to be processed
-            return await react_voice(message)
-            # updating_msg = await message.reply_text(f'{voice_tag} 2.0 升级中，敬请谅解。', quote=False)
-            # await asyncio.sleep(5)
-            # await updating_msg.delete()
-            # return updating_msg
+            return await react_voice(event)
     return None

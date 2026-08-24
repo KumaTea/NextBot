@@ -1,8 +1,13 @@
 import os
 
+# Single-sourced from the shared submodule: these were duplicated here and had
+# already drifted apart (this copy still claimed Chrome 122).
+from share.data import url_regex, USER_AGENT  # noqa: F401
+
 
 if os.name == 'nt':
-    pwd = 'D:\\GitHub\\NextBot'
+    # the repo root, wherever it has been checked out
+    pwd = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     TEMP_DIR = './data/dev/shm'
 else:
     pwd = '/home/kuma/bots/rbsk'
@@ -13,11 +18,6 @@ REBOOT_CMD = (
     "kill $(ps aux | grep python3 | head -n 1 | awk '{print $2}'); "
     "kill $(ps aux | grep tail | head -n 1 | awk '{print $2}')"
 )
-
-url_regex = r'https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|' \
-            r'www\.[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|' \
-            r'https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9]+\.[^\s]{2,}|' \
-            r'www\.[a-zA-Z0-9]+\.[^\s]{2,}'
 
 cmd_re = r'^/\w+(@\w+)?[\s\n]'
 start_user_re = r'^@[\w_]+:?\s?'
@@ -63,16 +63,10 @@ bot_commands = {
     'debate': ['debate'],
     'ocr': ['ocr'],
     'cap': ['cap'],
+    'transcribe': ['transcribe', 'stt'],
 }
 
 MEDIA_BOT_CMD = 'python3 mediabot.py >> /tmp/media.log 2>&1'
-
-USER_AGENT = (
-    'Mozilla/5.0 (Windows NT 10.0; Win64; x64) '
-    'AppleWebKit/537.36 (KHTML, like Gecko) '
-    'Chrome/122.0.0.0 '
-    'Safari/537.36'
-)
 
 TWITTER_USER_AGENT = (
     # 'Twitterbot/1.0'

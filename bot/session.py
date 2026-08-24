@@ -1,8 +1,7 @@
 import logging
-import pyrogram
 import configparser
 from bot.store import MsgStore
-from pyrogram import Client as tgClient
+from telethon import TelegramClient
 from openai import AsyncClient as aiClient
 
 
@@ -14,11 +13,15 @@ logging.basicConfig(
 config = configparser.ConfigParser()
 config.read('config.ini')
 
-bot = tgClient(
-    'rbsk',
-    api_id=config['tg']['api_id'],
-    api_hash=config['tg']['api_hash'],
-    bot_token=config['tg']['bot_token'],
+BOT_TOKEN = config['tg']['bot_token']
+
+# `rbsk-tl.session`, deliberately not the old pyrogram `rbsk.session`:
+# the two formats are incompatible, and keeping both files apart means
+# the pyrogram session survives if you ever want to go back.
+bot = TelegramClient(
+    'rbsk-tl',
+    int(config['tg']['api_id']),
+    config['tg']['api_hash'],
 )
 
 gpt = aiClient(
@@ -26,7 +29,4 @@ gpt = aiClient(
     base_url=config['openai']['endpoint'],
 )
 
-msg_store = MsgStore()
-
-pyrogram_version = tuple(map(int, pyrogram.__version__.split('.')))
-is_old_pyrogram = pyrogram_version <= (2, 0, 106)
+msg_store = MsgStore(client=bot)
