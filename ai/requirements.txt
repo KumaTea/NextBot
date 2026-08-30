@@ -1,10 +1,11 @@
-# conda create -n ai python=3.12 pytorch torchvision torchaudio cpuonly transformers accelerate uvicorn starlette openai -c pytorch
+# conda create -n ai python=3.12
+# pip install -r requirements.txt
 
-
-torch
 aiohttp
 uvicorn
 starlette
-accelerate
-# apscheduler
-transformers
+
+# CPU whisper on CTranslate2. Pulls in ctranslate2, tokenizers, onnxruntime
+# (the Silero VAD) and av (decoding) -- no torch, no transformers, and no
+# system ffmpeg. >=1.1 is what knows the 'large-v3-turbo' name.
+faster-whisper>=1.1

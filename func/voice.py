@@ -94,7 +94,9 @@ async def transcribe_into(inform: Message, media) -> Message:
     if not text or any(word in text for word in whisper_blacklist):
         return await inform.edit('听不懂捏')
 
-    seperator = '\n' if '\n' in text else ' '
+    # long transcripts used to arrive split into lines, which put the tag
+    # on its own line for free; they are one paragraph now, so ask by length
+    seperator = '\n' if ('\n' in text or len(text) > 80) else ' '
     return await inform.edit(f'{text}{seperator}{voice_tag}')
 
 
